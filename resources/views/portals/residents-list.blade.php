@@ -23,20 +23,10 @@
             onkeyup="filterTable()"
         >
 
-        <!-- Filter Role -->
-        <select
-            id="roleFilter"
-            onchange="filterTable()"
-            class="border rounded px-4 py-2"
-        >
-            <option value="">All Roles</option>
-            <option value="resident">Resident</option>
-            <option value="admin">Admin</option>
-        </select>
-
+    </div>
 
     <!-- TABLE -->
-
+    <div class="bg-white rounded shadow overflow-hidden">
 
         <table class="min-w-full border-collapse">
             <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
@@ -55,12 +45,12 @@
 
                 @forelse ($residents as $resident)
                     <tr class="border-t hover:bg-gray-50">
-                        <td class="px-4 py-2">{{ $resident->name }}</td>
+                        <td class="px-4 py-2">{{ $resident->full_name }}</td>
                         <td class="px-4 py-2">{{ $resident->email }}</td>
-                        <td class="px-4 py-2">{{ $resident->age ?? '—' }}</td>
+                        <td class="px-4 py-2">{{ $resident->age }}</td>
                         <td class="px-4 py-2">{{ $resident->civil_status }}</td>
                         <td class="px-4 py-2">{{ $resident->purok }}</td>
-                        <td class="px-4 py-2 capitalize">{{ $resident->role }}</td>
+                        <td class="px-4 py-2 capitalize">Resident</td>
                         <td class="px-4 py-2 text-center">
                             <a href="#" class="text-blue-600 hover:underline text-sm">
                                 View
@@ -80,21 +70,16 @@
 </div>
 </div>
 
-<!-- SIMPLE SEARCH + FILTER SCRIPT -->
+<!-- SIMPLE SEARCH SCRIPT -->
 <script>
 function filterTable() {
     const search = document.getElementById('searchInput').value.toLowerCase();
-    const role = document.getElementById('roleFilter').value.toLowerCase();
     const rows = document.querySelectorAll('#residentsTable tr');
 
     rows.forEach(row => {
         const text = row.innerText.toLowerCase();
-        const rowRole = row.children[5]?.innerText.toLowerCase();
-
         const matchesSearch = text.includes(search);
-        const matchesRole = role === '' || rowRole === role;
-
-        row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
+        row.style.display = matchesSearch ? '' : 'none';
     });
 }
 </script>

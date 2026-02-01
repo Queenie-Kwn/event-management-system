@@ -34,8 +34,8 @@
     <form action="{{ route('signup.store') }}" method="POST" class="space-y-4">
         @csrf
         <div>
-            <label for="name" class="block text-gray-700 mb-1">Full Name</label>
-            <input type="text" name="name" id="name" placeholder="Enter your full name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+            <label for="full_name" class="block text-gray-700 mb-1">Full Name</label>
+            <input type="text" name="full_name" id="full_name" placeholder="Enter your full name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
         </div>
 
         <div>
@@ -48,11 +48,34 @@
             <input type="password" name="password" id="password" placeholder="Enter your password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
         </div>
 
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="age" class="block text-gray-700 mb-1">Age</label>
+                <input type="number" name="age" id="age" placeholder="Age" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+            </div>
+            <div>
+                <label for="civil_status" class="block text-gray-700 mb-1">Civil Status</label>
+                <select name="civil_status" id="civil_status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+                    <option value="">Select Status</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                    <option value="Widowed">Widowed</option>
+                </select>
+            </div>
+        </div>
+
         <div>
-            <label for="role" class="block text-gray-700 mb-1">Role</label>
-            <select name="role" id="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
-                <option value="resident" selected>Resident</option>
-                <option value="admin">Admin</option>
+            <label for="purok" class="block text-gray-700 mb-1">Purok</label>
+            <input type="text" name="purok" id="purok" placeholder="Enter your purok" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+        </div>
+
+        <div>
+            <label for="indigent_status" class="block text-gray-700 mb-1">Indigent Status</label>
+            <select name="indigent_status" id="indigent_status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+                <option value="">Select Status</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
             </select>
         </div>
 
