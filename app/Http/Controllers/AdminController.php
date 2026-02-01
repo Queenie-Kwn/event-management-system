@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Resident;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -12,31 +12,24 @@ class AdminController extends Controller
      */
     public function residentsList(Request $request)
     {
-        $query = User::query();
+        $query = Resident::query();
 
         // Search by name or email
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
+                $q->where('full_name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
-        // Filter by role
-        if ($request->filled('role')) {
-            $query->where('role', $request->role);
-        }
-
-        $residents = $query->orderBy('name')->get();
+        $residents = $query->orderBy('full_name')->get();
 
         return view('portals.residents-list', compact('residents'));
     }
 
     public function indigency()
     {
-        $residents = User::where('role', 'resident')
-                        ->orderBy('name')
-                        ->get();
+        $residents = Resident::orderBy('full_name')->get();
 
         return view('portals.dashboard', compact('residents'));
     }
