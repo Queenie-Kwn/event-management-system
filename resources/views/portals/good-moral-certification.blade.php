@@ -1,6 +1,6 @@
 @extends('home.admin')
 
-@section('title', 'Certificate of Indigency')
+@section('title', 'Certificate of Good Moral Character')
 
 @section('content')
 
@@ -39,7 +39,7 @@
 
     <!-- TITLE -->
     <h2 class="text-center tracking-widest text-xl font-semibold mb-10">
-        CERTIFICATE OF INDIGENCY
+        CERTIFICATE OF GOOD MORAL CHARACTER
     </h2>
 
     <!-- BODY -->
@@ -49,37 +49,29 @@
 
         <p>
             This is to certify that
-            <input type="text" class="font-bold underline px-2 bg-transparent border-none outline-none" value="" placeholder="Enter name" style="width: auto;">,
-            of legal age, single/married, is a resident of
-            Purok <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Purok" style="width: auto;">,
-            Barangay Bagacay, Dumaguete City.
+            <input type="text" id="certName" class="font-bold underline px-2 bg-transparent border-none outline-none" value="HARLEY JOHN T. AGUIRRE" placeholder="Full Name" style="width: auto;">,
+            <input type="text" class="underline px-3 bg-transparent border-none outline-none" value="22" placeholder="Age" style="width: auto;">
+            years old, is known to be a person of good moral character and good standing in our Barangay.
         </p>
 
         <p>
-            Furthermore he/she belongs to the indigent families of this barangay
-            whose family income falls below poverty line.
-        </p>
-
-        <p>
-            This certification is issued upon the request of the aforementioned for
-            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Purpose" style="width: auto;">.
+            This certification is issued upon the request of the above name – mentioned for whatever legal purpose it may serve him best.
         </p>
 
         <p>
             Issued this
-            <input type="text" id="day" class="underline px-3 bg-transparent border-none outline-none" placeholder="Day" style="width: auto;">
+            <input type="text" id="day" class="underline px-3 bg-transparent border-none outline-none" value="1st" placeholder="Day" style="width: auto;">
             day of
-            <input type="text" id="month" class="underline px-6 bg-transparent border-none outline-none" placeholder="Month" style="width: auto;">,
-            <input type="text" id="year" class="underline px-6 bg-transparent border-none outline-none" placeholder="Year" style="width: auto;">
-            at the office of the Barangay Captain Barangay Bagacay,
-            Dumaguete City, Philippines.
+            <input type="text" id="month" class="underline px-6 bg-transparent border-none outline-none" value="July" placeholder="Month" style="width: auto;">,
+            <input type="text" id="year" class="underline px-6 bg-transparent border-none outline-none" value="2024" placeholder="Year" style="width: auto;">,
+            at the office of the Barangay Captain, Barangay Bagacay, Dumaguete City.
         </p>
 
         <br><br><br>
 
         <!-- SIGNATURE -->
         <div class="text-center mt-16">
-            <p class="font-bold uppercase">VINCENT ANDREW A. PERIGUA</p>
+            <p class="font-bold uppercase">VINCENT A. PERIGUA</p>
             <p>Punong Barangay</p>
         </div>
     </div>

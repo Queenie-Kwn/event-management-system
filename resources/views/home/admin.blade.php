@@ -8,13 +8,19 @@
 </head>
 <body class="flex min-h-screen bg-gray-100">
 
+    <!-- Mobile menu button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-50 bg-[#0b2c5f] text-white p-2 rounded">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
     <!-- Sidebar -->
-    <div class="w-64 bg-[#0b2c5f] text-white flex-shrink-0 shadow-xl fixed left-0 top-0 h-screen overflow-y-auto">
+    <div id="sidebar" class="w-64 bg-[#0b2c5f] text-white flex-shrink-0 shadow-xl fixed left-0 top-0 h-screen overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40">
         <div class="p-6 text-center gap-3">
             <img src="{{ asset('images/barangay_logo.jpg') }}"
                 alt="Bagacay Logo"
                 class="w-26 h-26 object-contain">
-            <!-- <span class="font-bold text-xl">Admin Panel</span> -->
         </div>
 
          <nav>
@@ -23,8 +29,8 @@
                 Dashboard
             </a>
 
-             <a href="#"
-            class="block py-2 px-6">
+             <a href="{{ route('dashboard.document-requests') }}"
+            class="block py-2 px-6 {{ request()->routeIs('dashboard.document-requests') ? 'bg-blue-400' : 'hover:bg-blue-700' }}">
                 Document Requests
             </a>
 
@@ -34,6 +40,9 @@
             $documentsOpen =
                 request()->routeIs('dashboard.portal') ||
                 request()->routeIs('dashboard.agriculture') ||
+                request()->routeIs('dashboard.barangay-certification') ||
+                request()->routeIs('dashboard.business-certification') ||
+                request()->routeIs('dashboard.good-moral-certification') ||
                 request()->routeIs('events.*');
 
             $usersOpen =
@@ -58,8 +67,8 @@
             </button>
 
             <div id="requestMenu"
-                class="ml-4 mt-2 space-y-1 overflow-hidden transition-all duration-300
-                {{ $documentsOpen ? 'max-h-[500px]' : 'max-h-0' }}">
+                class="ml-4 mt-2 space-y-1 overflow-y-auto transition-all duration-300
+                {{ $documentsOpen ? 'max-h-96' : 'max-h-0' }}">
 
               <a href="{{ route('dashboard.portal') }}"
                 class="flex items-center gap-2 py-2 px-4 rounded
@@ -83,18 +92,20 @@
                 </a>
 
 
-                      <a href="#"
-                        class="flex items-center gap-2 px-4 py-2 text-white hover:bg-blue-700">
+                      <a href="{{ route('dashboard.barangay-certification') }}"
+                        class="flex items-center gap-2 py-2 px-4 rounded
+                        {{ request()->routeIs('dashboard.barangay-certification') ? 'bg-blue-400 text-white' : 'hover:bg-blue-700' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 11c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"/>
+                                    d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 012-2z"/>
                             </svg>
                             Barangay Certification
                         </a>
 
 
-                       <a href="#"
-                        class="flex items-center gap-2 px-4 py-2 text-white hover:bg-blue-700">
+                       <a href="{{ route('dashboard.business-certification') }}"
+                        class="flex items-center gap-2 py-2 px-4 rounded
+                        {{ request()->routeIs('dashboard.business-certification') ? 'bg-blue-400 text-white' : 'hover:bg-blue-700' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 7h18M5 7V5a2 2 0 012-2h10a2 2 0 012 2v2M4 7v13h16V7"/>
@@ -103,25 +114,14 @@
                         </a>
 
 
-                       <a href="#"
-                        class="flex items-center gap-2 px-4 py-2 text-white hover:bg-blue-700 mb-4">
+                       <a href="{{ route('dashboard.good-moral-certification') }}"
+                        class="flex items-center gap-2 py-2 px-4 rounded mb-4
+                        {{ request()->routeIs('dashboard.good-moral-certification') ? 'bg-blue-400 text-white' : 'hover:bg-blue-700' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Certificate of Good Moral
-                        </a>
-
-
-
-                    <a href="{{ route('events.index') }}"
-                        class="flex items-center gap-2 py-2 px-4 rounded
-                        {{ request()->routeIs('events.*') ? 'bg-blue-400 text-white' : 'hover:bg-blue-700' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
-                            </svg>
-                            Events
                         </a>
 
             </div>
@@ -155,16 +155,6 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        Residents Accounts
-                    </a>
-
-                     <a href="{{ route('dashboard-residents.residents') }}"
-                    class="flex items-center gap-2 py-2 px-4 rounded
-                    {{ request()->routeIs('dashboard-residents.*') ? 'bg-blue-400 text-white' : 'hover:bg-blue-700' }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
                         Residents
                     </a>
 
@@ -189,11 +179,11 @@
     </div>
 
     <!-- Main content -->
-    <main class="flex-1 ml-64">
+    <main class="flex-1 lg:ml-64 ml-0">
         <!-- Header -->
        <header class="shadow p-4 mb-6 flex justify-between items-center bg-white">
             <!-- Header Title -->
-            <h1 class="text-2xl font-bold text-gray-800">BARANGAY BAGACAY MANAGEMENT SYSTEM</h1>
+            <h1 class="text-xl lg:text-2xl font-bold text-gray-800">BARANGAY BAGACAY MANAGEMENT SYSTEM</h1>
 
             <!-- Profile Dropdown -->
             <div class="relative">
@@ -214,6 +204,47 @@
         </header>
 
         <script>
+            // Clear all text inputs on page load
+            window.addEventListener('load', function() {
+                const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea');
+                inputs.forEach(input => {
+                    input.value = '';
+                });
+            });
+
+            // Clear all text inputs after form submission
+            document.addEventListener('DOMContentLoaded', function() {
+                const forms = document.querySelectorAll('form');
+                forms.forEach(form => {
+                    form.addEventListener('submit', function() {
+                        setTimeout(() => {
+                            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea');
+                            inputs.forEach(input => {
+                                input.value = '';
+                            });
+                        }, 100);
+                    });
+                });
+            });
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth < 1024 &&
+                    !sidebar.contains(e.target) &&
+                    !mobileMenuBtn.contains(e.target) &&
+                    !e.target.closest('button[onclick]')) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
+
             // Get elements
             const profileBtn = document.getElementById('profileBtn');
             const profileDropdown = document.getElementById('profileDropdown');
@@ -238,11 +269,11 @@
 
                     if (menu.classList.contains('max-h-0')) {
                         menu.classList.remove('max-h-0');
-                        menu.classList.add('max-h-40');
+                        menu.classList.add('max-h-96');
                         icon.classList.add('rotate-180');
                     } else {
                         menu.classList.add('max-h-0');
-                        menu.classList.remove('max-h-40');
+                        menu.classList.remove('max-h-96');
                         icon.classList.remove('rotate-180');
                     }
                 }

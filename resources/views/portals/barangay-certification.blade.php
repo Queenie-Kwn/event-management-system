@@ -1,6 +1,6 @@
 @extends('home.admin')
 
-@section('title', 'Certificate of Indigency')
+@section('title', 'Barangay Certification')
 
 @section('content')
 
@@ -28,7 +28,6 @@
              class="w-24 h-24 mx-auto mb-2 object-contain">
 
         <p>Republic of the Philippines</p>
-        <p>Province of Negros Oriental</p>
         <p>City of Dumaguete</p>
 
         <p class="font-bold mt-2">OFFICE OF THE BARANGAY CAPTAIN</p>
@@ -39,7 +38,7 @@
 
     <!-- TITLE -->
     <h2 class="text-center tracking-widest text-xl font-semibold mb-10">
-        CERTIFICATE OF INDIGENCY
+        BARANGAY CERTIFICATION
     </h2>
 
     <!-- BODY -->
@@ -49,30 +48,28 @@
 
         <p>
             This is to certify that
-            <input type="text" class="font-bold underline px-2 bg-transparent border-none outline-none" value="" placeholder="Enter name" style="width: auto;">,
-            of legal age, single/married, is a resident of
-            Purok <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Purok" style="width: auto;">,
-            Barangay Bagacay, Dumaguete City.
-        </p>
-
-        <p>
-            Furthermore he/she belongs to the indigent families of this barangay
-            whose family income falls below poverty line.
+            <input type="text" id="certName" class="font-bold underline px-2 bg-transparent border-none outline-none" value="BENGIE FABURADA" placeholder="Full Name" style="width: auto;">,
+            of legal age, a resident of
+            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="Purok Malang Suba" placeholder="Purok/Address" style="width: auto;">,
+            Barangay Bagacay, Dumaguete City, engaged in
+            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="Pasalubong" placeholder="Business Type" style="width: auto;">
+            business since
+            <input type="text" class="underline px-3 bg-transparent border-none outline-none" value="2015" placeholder="Year" style="width: auto;">
+            up to the present.
         </p>
 
         <p>
             This certification is issued upon the request of the aforementioned for
-            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Purpose" style="width: auto;">.
+            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="loan purpose" placeholder="Purpose" style="width: auto;">.
         </p>
 
         <p>
             Issued this
-            <input type="text" id="day" class="underline px-3 bg-transparent border-none outline-none" placeholder="Day" style="width: auto;">
+            <input type="text" id="day" class="underline px-3 bg-transparent border-none outline-none" value="7th" placeholder="Day" style="width: auto;">
             day of
-            <input type="text" id="month" class="underline px-6 bg-transparent border-none outline-none" placeholder="Month" style="width: auto;">,
-            <input type="text" id="year" class="underline px-6 bg-transparent border-none outline-none" placeholder="Year" style="width: auto;">
-            at the office of the Barangay Captain Barangay Bagacay,
-            Dumaguete City, Philippines.
+            <input type="text" id="month" class="underline px-6 bg-transparent border-none outline-none" value="February" placeholder="Month" style="width: auto;">,
+            <input type="text" id="year" class="underline px-6 bg-transparent border-none outline-none" value="2022" placeholder="Year" style="width: auto;">
+            at the office of the Barangay Captain Barangay Bagacay, Dumaguete City.
         </p>
 
         <br><br><br>

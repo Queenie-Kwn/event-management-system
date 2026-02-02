@@ -13,7 +13,7 @@ Route::get('/', function () {
 })->name('welcome-portal');
 
 Route::get('/signup-portal', function () {
-    return view('signup.signup'); 
+    return view('signup.signup');
 })->name('signup-portal');
 
 
@@ -26,7 +26,7 @@ Route::post('/login-user', [SignupController::class, 'LoginUser'])->name('login.
 
 //Dashboard
 Route::get('/admin-portal', function () {
-    return view('home.admin'); 
+    return view('home.admin');
 })->name('home.admin');
 
 
@@ -35,16 +35,34 @@ Route::get('/dashboard', [AdminController::class, 'indigency'])
 
 
 Route::get('/add-user', function () {
-    return view('portals.add-user'); 
+    return view('portals.add-user');
 })->name('add-user.portal');
 
 Route::get('/agri-dashboard', function () {
-    return view('portals.agriculture-cert'); 
+    return view('portals.agriculture-cert');
 })->name('dashboard.agriculture');
 
 
 Route::get('/residents', [AdminController::class, 'residentsList'])
     ->name('dashboard-residents.residents');
+
+Route::get('/document-requests', [AdminController::class, 'documentRequests'])
+    ->name('dashboard.document-requests');
+
+Route::get('/document-request/{id}', [AdminController::class, 'showDocumentRequest'])
+    ->name('document-request.show');
+
+Route::get('/barangay-certification', function () {
+    return view('portals.barangay-certification');
+})->name('dashboard.barangay-certification');
+
+Route::get('/business-certification', function () {
+    return view('portals.business-certification');
+})->name('dashboard.business-certification');
+
+Route::get('/good-moral-certification', function () {
+    return view('portals.good-moral-certification');
+})->name('dashboard.good-moral-certification');
 
 
 
