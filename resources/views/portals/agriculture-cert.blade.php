@@ -4,18 +4,8 @@
 
 @section('content')
 
-<!-- TOP BAR -->
-<div class="w-[816px] mx-auto my-4 flex justify-between items-center">
-    <div>
-        <label class="block text-sm font-medium mb-1">Select Resident:</label>
-        <input
-            id="userInput"
-            onchange="updateNameFromInput()"
-            placeholder="Enter full name"
-            class="border px-3 py-1 rounded w-64"
-        >
-    </div>
-
+<!-- PRINT BUTTON -->
+<div class="w-[816px] mx-auto my-4 text-right">
     <button
         onclick="window.print()"
         class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded text-sm font-semibold"
@@ -57,36 +47,36 @@
 
         <p>
             This is to certify that
-            <span id="certName" class="font-bold underline px-2">__________________</span>,
+            <input type="text" id="certName" class="font-bold underline px-2 bg-transparent border-none outline-none" value="" placeholder="Full Name" style="width: auto;">,
             of legal age, is a member of
-            <span class="underline px-6">__________________</span>
+            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Association Name" style="width: auto;">
             Association, a bonafide resident of Barangay Bagacay,
             Dumaguete City, Negros Oriental.
         </p>
 
         <p>This is to certify further that Mr./Mrs.
-            <span class="underline px-6">__________________</span> is:
+            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Full Name" style="width: auto;"> is:
         </p>
 
         <p>_____ A certified farmer tilling an area of
-            <span class="underline px-6">______</span>
+            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Area in hectares" style="width: auto;">
             hectares located in
-            <span class="underline px-6">____________</span> (barangay)
+            <input type="text" class="underline px-6 bg-transparent border-none outline-none" value="" placeholder="Barangay Name" style="width: auto;"> (barangay)
         </p>
 
         <p>_____ The area is planted with
-            <span class="underline px-10">________________________</span>
+            <input type="text" class="underline px-10 bg-transparent border-none outline-none" value="" placeholder="Crop Names" style="width: auto;">
             (name of crop/s)
         </p>
 
         <p>_____ The area is owned by
-            <span class="underline px-16">________________________</span>
+            <input type="text" class="underline px-16 bg-transparent border-none outline-none" value="" placeholder="Owner Name" style="width: auto;">
         </p>
 
         <p>_____ Raising livestock and poultry in his farm</p>
 
         <p>_____ He is a certified laborer/farm worker in the farm owned by
-            <span class="underline px-10">________________________</span>
+            <input type="text" class="underline px-10 bg-transparent border-none outline-none" value="" placeholder="Farm Owner Name" style="width: auto;">
         </p>
 
         <p class="mt-6">
@@ -97,17 +87,17 @@
 
         <p>
             Given this
-            <span id="day" class="underline px-3"></span>
+            <input type="text" id="day" class="underline px-3 bg-transparent border-none outline-none" placeholder="Day" style="width: auto;">
             day of
-            <span id="month" class="underline px-6"></span>,
-            <span id="year" class="underline px-6"></span>
+            <input type="text" id="month" class="underline px-6 bg-transparent border-none outline-none" placeholder="Month" style="width: auto;">,
+            <input type="text" id="year" class="underline px-6 bg-transparent border-none outline-none" placeholder="Year" style="width: auto;">
             at Barangay Bagacay, Dumaguete City.
         </p>
 
         <br><br>
 
         <!-- SIGNATURE -->
-        <div class="text-center mt-10">
+        <div class="text-center mt-16">
             <p class="font-bold uppercase">VINCENT ANDREW A. PERIGUA</p>
             <p>Barangay Captain</p>
         </div>
@@ -116,11 +106,6 @@
 
 <!-- SCRIPT -->
 <script>
-    function updateNameFromInput() {
-        document.getElementById('certName').innerText =
-            document.getElementById('userInput').value || '__________________';
-    }
-
     const today = new Date();
     document.getElementById('day').innerText = today.getDate();
     document.getElementById('month').innerText =

@@ -150,6 +150,17 @@
   </div>
 
   <script>
+    // Clear all text inputs on page load
+    window.addEventListener('load', function() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="date"], select, textarea');
+        inputs.forEach(input => {
+            input.value = '';
+            if (input.tagName === 'SELECT') {
+                input.selectedIndex = 0;
+            }
+        });
+    });
+
     feather.replace();
     
     function togglePassword() {

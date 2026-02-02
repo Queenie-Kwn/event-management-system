@@ -95,6 +95,14 @@
   </div>
   
   <script>
+    // Clear all text inputs on page load
+    window.addEventListener('load', function() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"], textarea');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+    });
+
     feather.replace();
     
     function togglePassword() {
