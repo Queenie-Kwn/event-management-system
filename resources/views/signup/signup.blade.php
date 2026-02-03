@@ -13,6 +13,8 @@
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen flex items-center justify-center p-4 sm:p-6">
 
+  @include('partials.splash')
+
   <div class="bg-white/80 backdrop-blur-sm w-full max-w-5xl rounded-3xl shadow-xl border border-white/20 p-6 sm:p-8">
 
    <div class="flex flex-col items-center mb-6">
