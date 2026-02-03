@@ -9,6 +9,10 @@ use App\Http\Controllers\AdminController;
 
 
 Route::get('/', function () {
+    return view('splash');
+})->name('splash');
+
+Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome-portal');
 
