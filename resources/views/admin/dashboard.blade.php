@@ -1,0 +1,285 @@
+@extends('home.admin')
+
+@section('title', 'Admin Dashboard')
+
+@section('content')
+<div class="p-6 space-y-6">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-3xl p-8 text-white shadow-2xl">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Welcome back, {{ Auth::user()->name }}!</h1>
+                <p class="text-blue-100 text-lg">Here's what's happening in Barangay Bagacay today</p>
+            </div>
+            <div class="hidden md:block">
+                <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
+                    <i data-feather="activity" class="w-12 h-12 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Users -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Total Residents</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($totalUsers) }}</p>
+                    <p class="text-green-600 text-sm mt-2">
+                        <i data-feather="trending-up" class="w-4 h-4 inline mr-1"></i>
+                        +{{ $monthlyUsers }} this month
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <i data-feather="users" class="w-6 h-6 text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Requests -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Document Requests</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($totalRequests) }}</p>
+                    <p class="text-blue-600 text-sm mt-2">
+                        <i data-feather="file-text" class="w-4 h-4 inline mr-1"></i>
+                        +{{ $monthlyRequests }} this month
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                    <i data-feather="file-text" class="w-6 h-6 text-green-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Requests -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Pending Requests</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($pendingRequests) }}</p>
+                    <p class="text-orange-600 text-sm mt-2">
+                        <i data-feather="clock" class="w-4 h-4 inline mr-1"></i>
+                        Needs attention
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <i data-feather="clock" class="w-6 h-6 text-orange-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Events -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Total Events</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($totalEvents) }}</p>
+                    <p class="text-purple-600 text-sm mt-2">
+                        <i data-feather="calendar" class="w-4 h-4 inline mr-1"></i>
+                        Community events
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <i data-feather="calendar" class="w-6 h-6 text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Analytics Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Request Status Chart -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Request Status Overview</h3>
+            <div class="space-y-4">
+                <!-- Approved -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
+                        <span class="text-gray-700 font-medium">Approved</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-gray-900 font-bold mr-2">{{ $approvedRequests }}</span>
+                        <div class="w-32 bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: {{ $totalRequests > 0 ? ($approvedRequests / $totalRequests) * 100 : 0 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-orange-500 rounded-full mr-3"></div>
+                        <span class="text-gray-700 font-medium">Pending</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-gray-900 font-bold mr-2">{{ $pendingRequests }}</span>
+                        <div class="w-32 bg-gray-200 rounded-full h-2">
+                            <div class="bg-orange-500 h-2 rounded-full" style="width: {{ $totalRequests > 0 ? ($pendingRequests / $totalRequests) * 100 : 0 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rejected -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
+                        <span class="text-gray-700 font-medium">Rejected</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-gray-900 font-bold mr-2">{{ $rejectedRequests }}</span>
+                        <div class="w-32 bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full" style="width: {{ $totalRequests > 0 ? ($rejectedRequests / $totalRequests) * 100 : 0 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Types -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Popular Document Types</h3>
+            <div class="space-y-3">
+                @forelse($documentTypes->take(5) as $type)
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                    <span class="text-gray-700 font-medium">{{ $type->doc_type ?: 'Unknown Document' }}</span>
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">{{ $type->count }}</span>
+                </div>
+                @empty
+                <div class="text-center py-4 text-gray-500">
+                    <i data-feather="file-x" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
+                    <p>No document requests yet</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    <!-- Purok Distribution and Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Purok Distribution -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Residents by Purok</h3>
+            <div class="space-y-3">
+                @forelse($purokDistribution as $purok)
+                <div class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl">
+                    <div class="flex items-center">
+                        <i data-feather="map-pin" class="w-4 h-4 text-blue-600 mr-2"></i>
+                        <span class="text-gray-700 font-medium">{{ $purok->purok ?: 'Unknown Purok' }}</span>
+                    </div>
+                    <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">{{ $purok->count }}</span>
+                </div>
+                @empty
+                <div class="text-center py-4 text-gray-500">
+                    <i data-feather="map" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
+                    <p>No purok data available</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Recent Document Requests</h3>
+            <div class="space-y-3">
+                @forelse($recentRequests as $request)
+                <div class="flex items-center justify-between p-3 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div>
+                        <p class="font-medium text-gray-900">{{ $request->resident->name ?? 'Unknown User' }}</p>
+                        <p class="text-sm text-gray-500">{{ Str::limit(explode(' - ', $request->purpose)[0] ?? $request->purpose, 30) }}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                            @if($request->status === 'approved') bg-green-100 text-green-800
+                            @elseif($request->status === 'rejected') bg-red-100 text-red-800
+                            @else bg-orange-100 text-orange-800 @endif">
+                            {{ ucfirst($request->status) }}
+                        </span>
+                        <p class="text-xs text-gray-400 mt-1">{{ $request->created_at->diffForHumans() }}</p>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-4 text-gray-500">
+                    <i data-feather="inbox" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
+                    <p>No recent requests</p>
+                </div>
+                @endforelse
+            </div>
+            <div class="mt-4 text-center">
+                <a href="{{ route('dashboard.document-requests') }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                    View all requests →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">System Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                <i data-feather="server" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
+                <p class="text-sm text-gray-600">System Status</p>
+                <p class="font-bold text-green-600">Online</p>
+            </div>
+            <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
+                <i data-feather="database" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+                <p class="text-sm text-gray-600">Database</p>
+                <p class="font-bold text-green-600">Connected</p>
+            </div>
+            <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+                <i data-feather="shield" class="w-8 h-8 text-purple-600 mx-auto mb-2"></i>
+                <p class="text-sm text-gray-600">Security</p>
+                <p class="font-bold text-green-600">Secure</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a href="{{ route('dashboard.document-requests') }}" class="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors group">
+                <i data-feather="file-text" class="w-8 h-8 text-blue-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-blue-800">View Requests</span>
+            </a>
+            <a href="{{ route('dashboard-residents.residents') }}" class="flex flex-col items-center p-4 bg-green-50 hover:bg-green-100 rounded-xl transition-colors group">
+                <i data-feather="users" class="w-8 h-8 text-green-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-green-800">Manage Residents</span>
+            </a>
+            <a href="{{ route('add-user.portal') }}" class="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors group">
+                <i data-feather="user-plus" class="w-8 h-8 text-purple-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-purple-800">Add Resident</span>
+            </a>
+            <a href="{{ route('dashboard.portal') }}" class="flex flex-col items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors group">
+                <i data-feather="file" class="w-8 h-8 text-orange-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-orange-800">Create Document</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize Feather icons
+    feather.replace();
+    
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate cards on load
+        const cards = document.querySelectorAll('.bg-white');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+@endsection

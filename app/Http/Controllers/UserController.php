@@ -30,6 +30,22 @@ class UserController extends Controller
         return view('user.requests', compact('requests'));
     }
 
+    public function viewRequestStatus($id)
+    {
+        $request = DocumentRequest::where('request_id', $id)
+            ->where('resident_id', Auth::user()->user_id)
+            ->firstOrFail();
+            
+        return response()->json([
+            'id' => $request->request_id,
+            'document_type' => explode(' - ', $request->purpose)[0] ?? 'Document Request',
+            'purpose' => explode(' - ', $request->purpose, 2)[1] ?? $request->purpose,
+            'status' => $request->status,
+            'request_date' => $request->created_at->format('M d, Y'),
+            'updated_at' => $request->updated_at->format('M d, Y h:i A')
+        ]);
+    }
+
     public function requestDocument(Request $request)
     {
         $request->validate([

@@ -3,139 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - Barangay Bagacay</title>
+    <title>Dashboard - Barangay Bagacay</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+        .animate-slide-up { animation: slideUp 0.8s ease-out; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen">
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-10 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute -bottom-32 left-40 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 4s;"></div>
+    </div>
+
+    <div class="relative min-h-screen">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b">
+        <header class="glass-effect sticky top-0 z-50 animate-fade-in">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-4">
-                    <div class="flex items-center">
-                        <img src="{{ asset('images/barangay_logo.jpg') }}" alt="Logo" class="w-10 h-10 rounded-full mr-3">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <img src="{{ asset('images/barangay_logo.jpg') }}" alt="Logo" class="w-12 h-12 rounded-full shadow-lg ring-4 ring-white/50">
+                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse-slow"></div>
+                        </div>
                         <div>
-                            <h1 class="text-xl font-semibold text-gray-900">Barangay Bagacay</h1>
-                            <p class="text-sm text-gray-500">Resident Portal</p>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Barangay Bagacay</h1>
+                            <p class="text-sm text-gray-600 font-medium">Digital Services Portal</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm text-gray-700">Welcome, {{ $user->name }}</span>
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="text-sm text-red-600 hover:text-red-800">Logout</button>
-                        </form>
+                    <div class="flex items-center space-x-6">
+                        <div class="hidden md:flex items-center space-x-2 bg-white/50 rounded-full px-4 py-2">
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            <span class="text-sm font-medium text-gray-700">Online</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="text-right">
+                                <p class="text-sm font-semibold text-gray-800">{{ $user->name }}</p>
+                                <p class="text-xs text-gray-600">{{ $user->purok }}</p>
+                            </div>
+                            <div class="relative">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
+                                    {{ substr($user->name, 0, 1) }}
+                                </div>
+                                <button onclick="toggleProfileMenu()" class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform">
+                                    <i data-feather="chevron-down" class="w-3 h-3 text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Profile Dropdown -->
+            <div id="profileMenu" class="absolute right-4 top-20 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 hidden animate-fade-in">
+                <div class="p-4 border-b border-gray-100">
+                    <p class="font-semibold text-gray-800">{{ $user->name }}</p>
+                    <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                </div>
+                <div class="p-2">
+                    <a href="{{ route('user.requests') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                        <i data-feather="file-text" class="w-4 h-4 text-blue-600"></i>
+                        <span class="text-sm font-medium">My Requests</span>
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="w-full">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors">
+                            <i data-feather="log-out" class="w-4 h-4"></i>
+                            <span class="text-sm font-medium">Logout</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
             @if(session('success'))
-                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                    {{ session('success') }}
+                <div class="bg-green-50 border border-green-200 rounded-2xl p-4 animate-fade-in">
+                    <div class="flex items-center space-x-3">
+                        <i data-feather="check-circle" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-green-800 font-medium">{{ session('success') }}</span>
+                    </div>
                 </div>
             @endif
 
-            <!-- Welcome Section -->
-            <div class="bg-white overflow-hidden shadow rounded-lg mb-6">
-                <div class="px-4 py-5 sm:p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome to Your Dashboard</h2>
-                    <p class="text-gray-600">Manage your documents and requests from Barangay Bagacay.</p>
-                </div>
-            </div>
-
-            <!-- User Info Card -->
-            <div class="bg-white overflow-hidden shadow rounded-lg mb-6">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Your Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500">Full Name</label>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->name }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500">Email</label>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->email }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500">Age</label>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->age }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500">Civil Status</label>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->civil_status }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500">Purok</label>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->purok }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500">Barangay</label>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->barangay }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Available Services</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Request Documents Section -->
-                        <div class="col-span-full">
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center mb-4">
-                                    <i data-feather="file-text" class="w-8 h-8 text-blue-600 mr-3"></i>
-                                    <h4 class="font-medium text-gray-900 text-lg">Request Documents</h4>
+            <!-- Welcome Hero Section -->
+            <div class="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-3xl shadow-2xl animate-slide-up">
+                <div class="absolute inset-0 bg-black/10"></div>
+                <div class="relative px-8 py-12 md:px-12 md:py-16">
+                    <div class="max-w-3xl">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 animate-fade-in">Welcome back, {{ explode(' ', $user->name)[0] }}! 👋</h2>
+                        <p class="text-blue-100 text-lg mb-8 animate-fade-in" style="animation-delay: 0.2s;">Your digital gateway to Barangay Bagacay services. Request documents, track applications, and stay connected with your community.</p>
+                        <div class="flex flex-wrap gap-4 animate-fade-in" style="animation-delay: 0.4s;">
+                            <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/30">
+                                <div class="flex items-center space-x-2">
+                                    <i data-feather="map-pin" class="w-4 h-4 text-white"></i>
+                                    <span class="text-white font-medium">{{ $user->purok }}, {{ $user->barangay }}</span>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    <a href="{{ route('user.request.indigency') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
-                                        <i data-feather="file" class="w-4 h-4 text-blue-600"></i>
-                                        <span>Indigency</span>
-                                    </a>
-                                    <a href="{{ route('user.request.agricultural') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
-                                        <i data-feather="sun" class="w-4 h-4 text-green-600"></i>
-                                        <span>Agricultural Certification</span>
-                                    </a>
-                                    <a href="{{ route('user.request.barangay') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
-                                        <i data-feather="award" class="w-4 h-4 text-purple-600"></i>
-                                        <span>Barangay Certification</span>
-                                    </a>
-                                    <a href="{{ route('user.request.business') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
-                                        <i data-feather="briefcase" class="w-4 h-4 text-orange-600"></i>
-                                        <span>Business Certification</span>
-                                    </a>
-                                    <a href="{{ route('user.request.good-moral') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
-                                        <i data-feather="check-circle" class="w-4 h-4 text-teal-600"></i>
-                                        <span>Certificate of Good Moral</span>
-                                    </a>
+                            </div>
+                            <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/30">
+                                <div class="flex items-center space-x-2">
+                                    <i data-feather="calendar" class="w-4 h-4 text-white"></i>
+                                    <span class="text-white font-medium">{{ now()->format('M d, Y') }}</span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Other Services -->
-                        <a href="{{ route('user.requests') }}" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer block">
-                            <i data-feather="clock" class="w-8 h-8 text-orange-600 mb-2"></i>
-                            <h4 class="font-medium text-gray-900">My Document Requests</h4>
-                            <p class="text-sm text-gray-500">View status of your requested documents</p>
-                            @if(isset($recentRequests) && $recentRequests->count() > 0)
-                                <div class="mt-2 text-xs text-blue-600">{{ $recentRequests->count() }} recent requests</div>
-                            @endif
-                        </a>
-                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
-                            <i data-feather="help-circle" class="w-8 h-8 text-purple-600 mb-2"></i>
-                            <h4 class="font-medium text-gray-900">Support</h4>
-                            <p class="text-sm text-gray-500">Get help and assistance</p>
+                    </div>
+                    <div class="absolute top-0 right-0 w-64 h-64 opacity-10">
+                        <div class="w-full h-full bg-white rounded-full animate-pulse-slow"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="glass-effect rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Requests</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ $recentRequests->count() ?? 0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
+                            <i data-feather="file-text" class="w-6 h-6 text-blue-600"></i>
                         </div>
                     </div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Pending</p>
+                            <p class="text-2xl font-bold text-orange-600">{{ $recentRequests->where('status', 'pending')->count() ?? 0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center">
+                            <i data-feather="clock" class="w-6 h-6 text-orange-600"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Completed</p>
+                            <p class="text-2xl font-bold text-green-600">{{ $recentRequests->where('status', 'approved')->count() ?? 0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                            <i data-feather="check-circle" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Services -->
+            <div class="glass-effect rounded-3xl p-8 animate-slide-up" style="animation-delay: 0.4s;">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Document Services</h3>
+                    <p class="text-gray-600">Request official documents from Barangay Bagacay</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="{{ route('user.request.indigency') }}" class="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 card-hover border border-blue-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-feather="file" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Certificate of Indigency</h4>
+                                <p class="text-sm text-gray-600">For financial assistance</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-blue-600 text-sm font-medium">
+                            <span>Request Now</span>
+                            <i data-feather="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ route('user.request.barangay') }}" class="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 card-hover border border-purple-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-feather="award" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Barangay Certification</h4>
+                                <p class="text-sm text-gray-600">General purpose certificate</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-purple-600 text-sm font-medium">
+                            <span>Request Now</span>
+                            <i data-feather="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ route('user.request.business') }}" class="group bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 card-hover border border-green-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-feather="briefcase" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Business Permit</h4>
+                                <p class="text-sm text-gray-600">For business operations</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-green-600 text-sm font-medium">
+                            <span>Request Now</span>
+                            <i data-feather="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ route('user.request.agricultural') }}" class="group bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-6 card-hover border border-yellow-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 bg-yellow-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-feather="sun" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Agricultural Certificate</h4>
+                                <p class="text-sm text-gray-600">For farming activities</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-yellow-600 text-sm font-medium">
+                            <span>Request Now</span>
+                            <i data-feather="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ route('user.request.good-moral') }}" class="group bg-gradient-to-br from-teal-50 to-teal-100 rounded-2xl p-6 card-hover border border-teal-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-feather="check-circle" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Good Moral Certificate</h4>
+                                <p class="text-sm text-gray-600">Character reference</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-teal-600 text-sm font-medium">
+                            <span>Request Now</span>
+                            <i data-feather="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ route('user.requests') }}" class="group bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 card-hover border border-gray-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 bg-gray-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-feather="list" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">My Requests</h4>
+                                <p class="text-sm text-gray-600">Track your applications</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-gray-600 text-sm font-medium">
+                            <span>View All</span>
+                            <i data-feather="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
                 </div>
             </div>
         </main>
@@ -143,6 +303,29 @@
 
     <script>
         feather.replace();
+        
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('profileMenu');
+            const button = e.target.closest('[onclick="toggleProfileMenu()"]');
+            if (!button && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+        
+        // Stagger animation for cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('animate-fade-in');
+            });
+        });
     </script>
 </body>
 </html>
