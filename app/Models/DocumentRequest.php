@@ -25,7 +25,7 @@ class DocumentRequest extends Model
 
     public function resident()
     {
-        return $this->belongsTo(Resident::class, 'resident_id', 'resident_id');
+        return $this->belongsTo(User::class, 'resident_id', 'user_id');
     }
 
     public function document()

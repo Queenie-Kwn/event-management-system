@@ -24,14 +24,14 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <button 
-                                onclick="showRequestDetails({{ $request->id }})"
+                                onclick="showRequestDetails({{ $request->request_id }})"
                                 class="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
                             >
-                                {{ $request->resident->full_name }}
+                                {{ $request->resident->name }}
                             </button>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ ucfirst(str_replace('_', ' ', $request->document_type)) }}
+                            {{ explode(' - ', $request->purpose)[0] ?? 'Document Request' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -43,11 +43,18 @@
                             {{ $request->created_at->format('M d, Y') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ route('document-request.view', $request->request_id) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
                             @if($request->status === 'pending')
-                            <button class="text-green-600 hover:text-green-900 mr-3">Approve</button>
-                            <button class="text-red-600 hover:text-red-900">Reject</button>
+                            <form action="{{ route('document-request.approve', $request->request_id) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-green-600 hover:text-green-900 mr-3">Approve</button>
+                            </form>
+                            <form action="{{ route('document-request.reject', $request->request_id) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-red-600 hover:text-red-900">Reject</button>
+                            </form>
                             @else
-                            <span class="text-gray-400">No actions</span>
+                            <span class="text-gray-400">{{ ucfirst($request->status) }}</span>
                             @endif
                         </td>
                     </tr>
@@ -91,7 +98,7 @@ function showRequestDetails(requestId) {
         .then(data => {
             document.getElementById('requestDetails').innerHTML = `
                 <div><strong>Resident:</strong> ${data.resident_name}</div>
-                <div><strong>Document Type:</strong> ${data.document_type.replace('_', ' ')}</div>
+                <div><strong>Document Type:</strong> ${data.document_type}</div>
                 <div><strong>Purpose:</strong> ${data.purpose || 'Not specified'}</div>
                 <div><strong>Status:</strong> ${data.status}</div>
                 <div><strong>Requested:</strong> ${data.requested_at}</div>

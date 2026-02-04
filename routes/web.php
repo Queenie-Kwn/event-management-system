@@ -41,6 +41,37 @@ Route::get('/user-dashboard', [UserController::class, 'dashboard'])
     ->middleware('auth')
     ->name('user.dashboard');
 
+//User Document Requests
+Route::get('/my-requests', [UserController::class, 'myRequests'])
+    ->middleware('auth')
+    ->name('user.requests');
+
+//Request Document Routes
+Route::post('/request-document', [UserController::class, 'requestDocument'])
+    ->middleware('auth')
+    ->name('user.request.document');
+
+//Individual Document Request Pages
+Route::get('/request/indigency', [UserController::class, 'requestIndigency'])
+    ->middleware('auth')
+    ->name('user.request.indigency');
+
+Route::get('/request/agricultural', [UserController::class, 'requestAgricultural'])
+    ->middleware('auth')
+    ->name('user.request.agricultural');
+
+Route::get('/request/barangay', [UserController::class, 'requestBarangay'])
+    ->middleware('auth')
+    ->name('user.request.barangay');
+
+Route::get('/request/business', [UserController::class, 'requestBusiness'])
+    ->middleware('auth')
+    ->name('user.request.business');
+
+Route::get('/request/good-moral', [UserController::class, 'requestGoodMoral'])
+    ->middleware('auth')
+    ->name('user.request.good-moral');
+
 //Admin Dashboard
 Route::get('/admin-portal', function () {
     return view('home.admin');
@@ -72,6 +103,18 @@ Route::get('/document-requests', [AdminController::class, 'documentRequests'])
 Route::get('/document-request/{id}', [AdminController::class, 'showDocumentRequest'])
     ->middleware(['auth', 'admin'])
     ->name('document-request.show');
+
+Route::post('/document-request/{id}/approve', [AdminController::class, 'approveRequest'])
+    ->middleware(['auth', 'admin'])
+    ->name('document-request.approve');
+
+Route::post('/document-request/{id}/reject', [AdminController::class, 'rejectRequest'])
+    ->middleware(['auth', 'admin'])
+    ->name('document-request.reject');
+
+Route::get('/document-request/{id}/view', [AdminController::class, 'viewDocument'])
+    ->middleware(['auth', 'admin'])
+    ->name('document-request.view');
 
 Route::get('/barangay-certification', function () {
     return view('portals.barangay-certification');
