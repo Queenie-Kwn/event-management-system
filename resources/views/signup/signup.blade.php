@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/feather-icons"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
   </style>
@@ -122,6 +124,35 @@
 
         <div class="grid grid-cols-1 gap-4">
             <div>
+                <label for="full_address" class="block text-sm font-medium text-slate-700 mb-2">Full Address</label>
+                <textarea name="full_address" id="full_address" rows="3" placeholder="Enter your complete address" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required></textarea>
+            </div>
+        </div>
+
+        <!-- Geo-tagging Section -->
+        <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100">
+            <div class="flex items-center justify-between mb-3">
+                <label class="block text-sm font-medium text-slate-700">Location (Geo-tagging)</label>
+                <button type="button" onclick="getCurrentLocation()" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs hover:bg-blue-700 transition-colors">
+                    <i data-feather="map-pin" class="w-3 h-3 inline mr-1"></i>
+                    Get Current Location
+                </button>
+            </div>
+            <div id="map" class="w-full h-48 bg-gray-200 rounded-xl mb-3"></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs text-slate-600 mb-1">Latitude</label>
+                    <input type="text" name="latitude" id="latitude" readonly class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-slate-600">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-600 mb-1">Longitude</label>
+                    <input type="text" name="longitude" id="longitude" readonly class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-slate-600">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            <div>
                 <label for="cash_assistance_programs" class="block text-sm font-medium text-slate-700 mb-2">Cash Assistance Programs</label>
                 <select name="cash_assistance_programs" id="cash_assistance_programs" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
                     <option value="">Select Cash Assistance Program</option>
@@ -152,13 +183,77 @@
   </div>
 
   <script>
+    let map, marker;
+    
+    // Initialize Leaflet Map
+    function initMap() {
+        const defaultLocation = [9.3077, 123.3026]; // Dumaguete City
+        
+        map = L.map('map').setView(defaultLocation, 15);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
+        
+        // Update coordinates when marker is dragged
+        marker.on('dragend', function() {
+            const position = marker.getLatLng();
+            updateCoordinates(position.lat, position.lng);
+        });
+        
+        // Click on map to move marker
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateCoordinates(e.latlng.lat, e.latlng.lng);
+        });
+        
+        // Set initial coordinates
+        updateCoordinates(defaultLocation[0], defaultLocation[1]);
+    }
+    
+    // Get current location
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    map.setView([lat, lng], 16);
+                    marker.setLatLng([lat, lng]);
+                    updateCoordinates(lat, lng);
+                },
+                function(error) {
+                    alert('Error getting location: ' + error.message);
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by this browser.');
+        }
+    }
+    
+    // Update coordinate inputs
+    function updateCoordinates(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+    }
+    
+    // Initialize map when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
+    
     // Clear all text inputs on page load
     window.addEventListener('load', function() {
         const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="date"], select, textarea');
         inputs.forEach(input => {
-            input.value = '';
-            if (input.tagName === 'SELECT') {
-                input.selectedIndex = 0;
+            if (input.id !== 'latitude' && input.id !== 'longitude') {
+                input.value = '';
+                if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                }
             }
         });
     });

@@ -74,8 +74,13 @@ Route::get('/request/good-moral', [UserController::class, 'requestGoodMoral'])
 
 //Admin Dashboard
 Route::get('/admin-portal', function () {
-    return view('home.admin');
+    return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'admin'])->name('home.admin');
+
+// Main Admin Dashboard with Statistics
+Route::get('/admin-dashboard', [AdminController::class, 'dashboard'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.dashboard');
 
 
 Route::get('/dashboard', [AdminController::class, 'indigency'])
@@ -115,6 +120,30 @@ Route::post('/document-request/{id}/reject', [AdminController::class, 'rejectReq
 Route::get('/document-request/{id}/view', [AdminController::class, 'viewDocument'])
     ->middleware(['auth', 'admin'])
     ->name('document-request.view');
+
+// Admin Logs
+Route::get('/admin-logs', [AdminController::class, 'adminLogs'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.logs');
+
+// Create Admin Account
+Route::get('/create-admin', [AdminController::class, 'createAdminForm'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.create-admin');
+
+Route::post('/create-admin', [AdminController::class, 'createAdmin'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.create-admin.store');
+
+// Residents Geo-tagging
+Route::get('/residents-map', [AdminController::class, 'residentsWithGeoTag'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.residents-map');
+
+// User Request Status
+Route::get('/user/request-status/{id}', [UserController::class, 'viewRequestStatus'])
+    ->middleware('auth')
+    ->name('user.request-status');
 
 Route::get('/barangay-certification', function () {
     return view('portals.barangay-certification');

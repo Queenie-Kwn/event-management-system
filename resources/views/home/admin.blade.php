@@ -31,7 +31,7 @@
         </div>
 
         <nav class="px-6 space-y-2">
-            <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-2xl text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 py-3 px-4 rounded-2xl {{ request()->routeIs('admin.dashboard') ? 'bg-blue-100 text-blue-700' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
                 <i data-feather="home" class="w-5 h-5"></i>
                 <span class="font-medium">Dashboard</span>
             </a>
@@ -103,7 +103,7 @@
                 <i data-feather="chevron-down" id="requestIcongg" class="w-4 h-4 transition-transform duration-300 {{ $usersOpen ? 'rotate-180' : '' }}"></i>
             </button>
 
-            <div id="requestMenuNice" class="ml-8 mt-2 space-y-1 overflow-hidden transition-all duration-300 {{ $usersOpen ? 'max-h-40' : 'max-h-0' }}">
+            <div id="requestMenuNice" class="ml-8 mt-2 space-y-1 overflow-hidden transition-all duration-300 {{ $usersOpen ? 'max-h-60' : 'max-h-0' }}">
                 <a href="{{ route('dashboard-residents.residents') }}" class="flex items-center gap-3 py-2 px-4 rounded-xl text-sm {{ request()->routeIs('dashboard-residents.*') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
                     <i data-feather="user" class="w-4 h-4"></i>
                     <span>Residents</span>
@@ -112,6 +112,33 @@
                 <a href="{{ route('add-user.portal') }}" class="flex items-center gap-3 py-2 px-4 rounded-xl text-sm {{ request()->routeIs('add-user.*') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
                     <i data-feather="user-plus" class="w-4 h-4"></i>
                     <span>Add Residents</span>
+                </a>
+
+                <a href="{{ route('admin.residents-map') }}" class="flex items-center gap-3 py-2 px-4 rounded-xl text-sm {{ request()->routeIs('admin.residents-map') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
+                    <i data-feather="map" class="w-4 h-4"></i>
+                    <span>Residents Map</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="px-6 mt-4">
+            <button onclick="toggleAdminMenu()" class="w-full flex justify-between items-center text-left py-3 px-4 rounded-2xl text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
+                <div class="flex items-center gap-3">
+                    <i data-feather="settings" class="w-5 h-5"></i>
+                    <span class="font-medium">Administration</span>
+                </div>
+                <i data-feather="chevron-down" id="adminMenuIcon" class="w-4 h-4 transition-transform duration-300"></i>
+            </button>
+
+            <div id="adminMenu" class="ml-8 mt-2 space-y-1 overflow-hidden transition-all duration-300 max-h-0">
+                <a href="{{ route('admin.logs') }}" class="flex items-center gap-3 py-2 px-4 rounded-xl text-sm {{ request()->routeIs('admin.logs') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
+                    <i data-feather="activity" class="w-4 h-4"></i>
+                    <span>Activity Logs</span>
+                </a>
+
+                <a href="{{ route('admin.create-admin') }}" class="flex items-center gap-3 py-2 px-4 rounded-xl text-sm {{ request()->routeIs('admin.create-admin') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
+                    <i data-feather="user-plus" class="w-4 h-4"></i>
+                    <span>Create Admin</span>
                 </a>
             </div>
         </div>
@@ -251,6 +278,21 @@
             function toggleRequestUser() {
                 const menu = document.getElementById('requestMenuNice');
                 const icon = document.getElementById('requestIcongg');
+
+                if (menu.classList.contains('max-h-0')) {
+                    menu.classList.remove('max-h-0');
+                    menu.classList.add('max-h-60');
+                    icon.classList.add('rotate-180');
+                } else {
+                    menu.classList.add('max-h-0');
+                    menu.classList.remove('max-h-60');
+                    icon.classList.remove('rotate-180');
+                }
+            }
+
+            function toggleAdminMenu() {
+                const menu = document.getElementById('adminMenu');
+                const icon = document.getElementById('adminMenuIcon');
 
                 if (menu.classList.contains('max-h-0')) {
                     menu.classList.remove('max-h-0');
