@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'resident',
-        'passwords' => 'residents',
+        'guard' => 'web',
+        'passwords' => 'users',
     ],
 
     /*
@@ -38,7 +38,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'residents',
+            'provider' => 'users',
         ],
         'resident' => [
             'driver' => 'session',

@@ -12,16 +12,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::factory(10)->create();
-
+        // Create admin user
         \App\Models\User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            'name' => 'Admin User',
+            'email' => 'admin@bagacay.gov.ph',
+            'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
             'role' => 'admin',
-            'age' => 30,
+            'age' => 35,
             'civil_status' => 'Single',
-            'purok' => 'Purok 1',
+            'purok' => 'Admin Office',
+            'barangay' => 'Bagacay',
+            'city' => 'Dumaguete City',
             'is_indigent' => 'No',
             'purpose' => 'System Administrator',
             'date_issued' => now()->format('Y-m-d'),

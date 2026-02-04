@@ -15,7 +15,7 @@ class User extends Authenticatable
     protected $primaryKey = 'user_id';
 
     // Disable updated_at since you only have created_at
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +25,15 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'created_at', // optional, if you want to set manually
+        'age',
+        'civil_status',
+        'purok',
+        'barangay',
+        'city',
+        'is_indigent',
+        'purpose',
+        'date_issued',
+        'created_at',
     ];
 
     /**

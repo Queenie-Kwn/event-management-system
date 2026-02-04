@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -25,48 +27,63 @@ Route::get('/signup-portal', function () {
 //Signup Route Process
 Route::post('/signup', [SignupController::class, 'store'])->name('signup.store');
 
-//Admin Login Route Process
+//Login Route Process
 Route::post('/login-user', [SignupController::class, 'LoginUser'])->name('login.user');
 
-//Dashboard
+//Logout Route
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect()->route('welcome-portal')->with('success', 'Logged out successfully!');
+})->name('logout');
+
+//User Dashboard
+Route::get('/user-dashboard', [UserController::class, 'dashboard'])
+    ->middleware('auth')
+    ->name('user.dashboard');
+
+//Admin Dashboard
 Route::get('/admin-portal', function () {
     return view('home.admin');
-})->name('home.admin');
+})->middleware(['auth', 'admin'])->name('home.admin');
 
 
 Route::get('/dashboard', [AdminController::class, 'indigency'])
+    ->middleware(['auth', 'admin'])
     ->name('dashboard.portal');
 
 
 Route::get('/add-user', function () {
     return view('portals.add-user');
-})->name('add-user.portal');
+})->middleware(['auth', 'admin'])->name('add-user.portal');
 
 Route::get('/agri-dashboard', function () {
     return view('portals.agriculture-cert');
-})->name('dashboard.agriculture');
+})->middleware(['auth', 'admin'])->name('dashboard.agriculture');
 
 
 Route::get('/residents', [AdminController::class, 'residentsList'])
+    ->middleware(['auth', 'admin'])
     ->name('dashboard-residents.residents');
 
 Route::get('/document-requests', [AdminController::class, 'documentRequests'])
+    ->middleware(['auth', 'admin'])
     ->name('dashboard.document-requests');
 
 Route::get('/document-request/{id}', [AdminController::class, 'showDocumentRequest'])
+    ->middleware(['auth', 'admin'])
     ->name('document-request.show');
 
 Route::get('/barangay-certification', function () {
     return view('portals.barangay-certification');
-})->name('dashboard.barangay-certification');
+})->middleware(['auth', 'admin'])->name('dashboard.barangay-certification');
 
 Route::get('/business-certification', function () {
     return view('portals.business-certification');
-})->name('dashboard.business-certification');
+})->middleware(['auth', 'admin'])->name('dashboard.business-certification');
 
 Route::get('/good-moral-certification', function () {
     return view('portals.good-moral-certification');
-})->name('dashboard.good-moral-certification');
+})->middleware(['auth', 'admin'])->name('dashboard.good-moral-certification');
 
 
 
