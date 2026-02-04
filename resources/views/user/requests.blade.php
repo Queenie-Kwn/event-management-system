@@ -194,6 +194,15 @@
         </main>
     </div>
 
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-3xl p-8 shadow-2xl text-center animate-fade-in">
+            <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Loading...</h3>
+            <p class="text-gray-600">Please wait while we fetch your request details</p>
+        </div>
+    </div>
+
     <!-- Request Details Modal -->
     <div id="requestModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border-0 w-96 animate-fade-in">
@@ -219,10 +228,20 @@
     <script>
         feather.replace();
         
+        function showLoading() {
+            document.getElementById('loadingModal').classList.remove('hidden');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingModal').classList.add('hidden');
+        }
+        
         function viewRequestDetails(requestId) {
+            showLoading();
             fetch(`/user/request-status/${requestId}`)
                 .then(response => response.json())
                 .then(data => {
+                    hideLoading();
                     const statusColor = data.status === 'approved' ? 'text-green-600' : 
                                       data.status === 'rejected' ? 'text-red-600' : 'text-orange-600';
                     const statusBg = data.status === 'approved' ? 'bg-green-50 border-green-200' : 
@@ -255,6 +274,7 @@
                     feather.replace();
                 })
                 .catch(error => {
+                    hideLoading();
                     console.error('Error:', error);
                     alert('Error loading request details');
                 });

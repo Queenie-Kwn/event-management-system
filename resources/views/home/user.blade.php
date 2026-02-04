@@ -301,8 +301,25 @@
         </main>
     </div>
 
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-3xl p-8 shadow-2xl text-center animate-fade-in">
+            <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Loading...</h3>
+            <p class="text-gray-600">Please wait while we process your request</p>
+        </div>
+    </div>
+
     <script>
         feather.replace();
+        
+        function showLoading() {
+            document.getElementById('loadingModal').classList.remove('hidden');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingModal').classList.add('hidden');
+        }
         
         function toggleProfileMenu() {
             const menu = document.getElementById('profileMenu');
@@ -318,8 +335,25 @@
             }
         });
         
-        // Stagger animation for cards
+        // Show loading on form submissions and link clicks
         document.addEventListener('DOMContentLoaded', function() {
+            // Show loading for all forms
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    showLoading();
+                });
+            });
+            
+            // Show loading for document request links
+            const docLinks = document.querySelectorAll('a[href*="request"]');
+            docLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    showLoading();
+                });
+            });
+            
+            // Stagger animation for cards
             const cards = document.querySelectorAll('.card-hover');
             cards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;
