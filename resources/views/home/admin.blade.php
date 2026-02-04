@@ -26,8 +26,8 @@
             <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg">
                 <i data-feather="map-pin" class="w-8 h-8 text-white"></i>
             </div>
-            <h2 class="text-lg font-bold text-slate-800 mb-1">Barangay Bagacay</h2>
-            <p class="text-sm text-slate-500 font-light">Management System</p>
+            <h2 class="text-lg font-bold text-blue-700 mb-1">Barangay Bagacay</h2>
+            <p class="text-sm text-blue-500 font-light">Management System</p>
         </div>
 
         <nav class="px-6 space-y-2">
@@ -116,36 +116,40 @@
             </div>
         </div>
 
+        <!-- Profile section at bottom -->
+        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-r from-blue-50 to-blue-100 backdrop-blur-sm border-t border-blue-200">
+            <div class="relative">
+                <button id="sidebarProfileBtn" class="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-blue-100 transition-all duration-200 focus:outline-none">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
+                        <i data-feather="user" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex-1 text-left">
+                        <p class="text-sm font-medium text-blue-800">{{ Auth::user()->name ?? 'Administrator' }}</p>
+                        <p class="text-xs text-blue-600">Admin</p>
+                    </div>
+                    <i data-feather="chevron-up" class="w-4 h-4 text-blue-600"></i>
+                </button>
+
+                <div id="sidebarProfileDropdown" class="absolute bottom-full left-0 right-0 mb-2 bg-white border border-blue-200 rounded-2xl shadow-lg py-2 hidden">
+                    <a href="{{ route('welcome-portal') }}" class="flex items-center gap-3 px-4 py-2 text-blue-700 hover:bg-blue-50 transition-colors">
+                        <i data-feather="log-out" class="w-4 h-4"></i>
+                        <span class="text-sm">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
 
     </div>
 
     <!-- Main content -->
     <main class="flex-1 lg:ml-72 ml-0">
         <!-- Header -->
-        <header class="bg-white/80 backdrop-blur-sm border-b border-white/20 shadow-sm p-6 mb-8 flex justify-between items-center">
-            <h1 class="text-2xl lg:text-3xl font-bold text-slate-800 tracking-tight">Barangay Bagacay Management System</h1>
+        <header class="bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200 shadow-sm p-6 mb-8 flex justify-between items-center">
+            <h1 class="text-2xl lg:text-3xl font-bold text-blue-800 tracking-tight">Barangay Bagacay Management System</h1>
 
-            <div class="flex items-center gap-6">
-                <div class="text-right">
-                    <p class="text-sm font-medium text-slate-800">{{ Auth::user()->name ?? 'Administrator' }}</p>
-                    <p class="text-xs text-slate-500" id="philippineTime"></p>
-                </div>
-                
-                <div class="relative">
-                    <button id="profileBtn" class="flex items-center gap-3 p-2 rounded-2xl hover:bg-blue-50 transition-all duration-200 focus:outline-none">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
-                            <i data-feather="user" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <i data-feather="chevron-down" class="w-4 h-4 text-slate-600"></i>
-                    </button>
-
-                    <div id="profileDropdown" class="absolute right-0 mt-2 w-40 bg-white/90 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl py-2 hidden">
-                        <a href="{{ route('welcome-portal') }}" class="flex items-center gap-2 px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
-                            <i data-feather="log-out" class="w-4 h-4"></i>
-                            <span class="font-medium">Logout</span>
-                        </a>
-                    </div>
-                </div>
+            <div class="flex items-center gap-2 text-blue-700">
+                <i data-feather="calendar" class="w-5 h-5"></i>
+                <p class="text-sm font-semibold" id="philippineTime"></p>
             </div>
         </header>
 
@@ -211,19 +215,21 @@
                 }
             });
 
-            // Get elements
-            const profileBtn = document.getElementById('profileBtn');
-            const profileDropdown = document.getElementById('profileDropdown');
+            // Get sidebar profile elements
+            const sidebarProfileBtn = document.getElementById('sidebarProfileBtn');
+            const sidebarProfileDropdown = document.getElementById('sidebarProfileDropdown');
 
-            // Toggle dropdown on click
-            profileBtn.addEventListener('click', () => {
-                profileDropdown.classList.toggle('hidden');
-            });
+            // Toggle sidebar profile dropdown
+            if (sidebarProfileBtn) {
+                sidebarProfileBtn.addEventListener('click', () => {
+                    sidebarProfileDropdown.classList.toggle('hidden');
+                });
+            }
 
-            // Optional: close dropdown if clicked outside
+            // Close sidebar profile dropdown when clicking outside
             window.addEventListener('click', function(e) {
-                if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.add('hidden');
+                if (sidebarProfileBtn && !sidebarProfileBtn.contains(e.target) && !sidebarProfileDropdown.contains(e.target)) {
+                    sidebarProfileDropdown.classList.add('hidden');
                 }
             });
 
