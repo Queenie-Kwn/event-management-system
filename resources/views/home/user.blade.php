@@ -97,23 +97,23 @@
                                     <h4 class="font-medium text-gray-900 text-lg">Request Documents</h4>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
+                                    <a href="{{ route('user.request.indigency') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
                                         <i data-feather="file" class="w-4 h-4 text-blue-600"></i>
                                         <span>Indigency</span>
                                     </a>
-                                    <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
+                                    <a href="{{ route('user.request.agricultural') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
                                         <i data-feather="sun" class="w-4 h-4 text-green-600"></i>
                                         <span>Agricultural Certification</span>
                                     </a>
-                                    <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
+                                    <a href="{{ route('user.request.barangay') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
                                         <i data-feather="award" class="w-4 h-4 text-purple-600"></i>
                                         <span>Barangay Certification</span>
                                     </a>
-                                    <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
+                                    <a href="{{ route('user.request.business') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
                                         <i data-feather="briefcase" class="w-4 h-4 text-orange-600"></i>
                                         <span>Business Certification</span>
                                     </a>
-                                    <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
+                                    <a href="{{ route('user.request.good-moral') }}" class="flex items-center gap-3 py-3 px-4 rounded-xl text-sm bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200">
                                         <i data-feather="check-circle" class="w-4 h-4 text-teal-600"></i>
                                         <span>Certificate of Good Moral</span>
                                     </a>
@@ -122,11 +122,14 @@
                         </div>
                         
                         <!-- Other Services -->
-                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
-                            <i data-feather="calendar" class="w-8 h-8 text-green-600 mb-2"></i>
-                            <h4 class="font-medium text-gray-900">Events</h4>
-                            <p class="text-sm text-gray-500">View upcoming barangay events</p>
-                        </div>
+                        <a href="{{ route('user.requests') }}" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer block">
+                            <i data-feather="clock" class="w-8 h-8 text-orange-600 mb-2"></i>
+                            <h4 class="font-medium text-gray-900">My Document Requests</h4>
+                            <p class="text-sm text-gray-500">View status of your requested documents</p>
+                            @if(isset($recentRequests) && $recentRequests->count() > 0)
+                                <div class="mt-2 text-xs text-blue-600">{{ $recentRequests->count() }} recent requests</div>
+                            @endif
+                        </a>
                         <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
                             <i data-feather="help-circle" class="w-8 h-8 text-purple-600 mb-2"></i>
                             <h4 class="font-medium text-gray-900">Support</h4>
