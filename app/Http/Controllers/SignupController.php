@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Resident;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,33 +15,46 @@ class SignupController extends Controller
     {
         // Validate input with custom message for duplicate email
         $request->validate([
-            'full_name' => 'required|string|max:150',
-            'email' => 'required|email|unique:residents,email',
+            'first_name' => 'required|string|max:150',
+            'last_name' => 'required|string|max:150',
+            'email' => 'required|email|unique:residents,email|unique:users,email',
             'password' => 'required|string|min:6',
-            'age' => 'required|integer|min:1',
+            'birthdate' => 'required|date',
             'civil_status' => 'required|string|max:20',
             'purok' => 'required|string|max:100',
-            'indigent_status' => 'required|string|max:20',
+            'cash_assistance_programs' => 'required|string|max:255',
         ], [
             'email.unique' => 'This email is already registered.',
         ]);
 
         try {
-            // Create resident
-            Resident::create([
-                'full_name' => $request->full_name,
+            // Calculate age from birthdate
+            $age = \Carbon\Carbon::parse($request->birthdate)->age;
+            
+            // Combine names
+            $fullName = trim($request->first_name . ' ' . ($request->middle_name ?? '') . ' ' . $request->last_name . ' ' . ($request->suffix ?? ''));
+            
+            // Create user with resident role
+            $user = User::create([
+                'name' => $fullName,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'age' => $request->age,
+                'password' => $request->password,
+                'role' => 'resident',
+                'age' => $age,
                 'civil_status' => $request->civil_status,
                 'purok' => $request->purok,
-                'barangay' => $request->barangay ?? 'Bagacay',
-                'city' => $request->city ?? 'Dumaguete City',
-                'indigent_status' => $request->indigent_status,
+                'barangay' => 'Bagacay',
+                'city' => 'Dumaguete City',
+                'is_indigent' => $request->cash_assistance_programs,
+                'purpose' => 'Resident Registration',
+                'date_issued' => now()->format('Y-m-d'),
             ]);
 
-            // Success message using browser alert
-            return back()->with('success', 'Signup successful!');
+            // Auto-login the new resident
+            Auth::login($user);
+
+            // Redirect to user interface
+            return redirect()->route('user.dashboard')->with('success', 'Registration successful! Welcome to your dashboard.');
 
         } catch (\Exception $e) {
             // Generic error
@@ -57,15 +71,19 @@ class SignupController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Attempt to find resident by email
-        $resident = Resident::where('email', $request->username)->first();
+        // Attempt to find user by email
+        $user = User::where('email', $request->username)->first();
 
-        if ($resident && Hash::check($request->password, $resident->password)) {
-            // Login successful, set session or use Auth
-            Auth::guard('resident')->login($resident);
+        if ($user && Hash::check($request->password, $user->password)) {
+            // Login successful
+            Auth::login($user);
 
-            // Redirect to dashboard
-            return redirect()->route('home.admin')->with('success', 'Login successful!');
+            // Redirect based on role
+            if ($user->role === 'admin') {
+                return redirect()->route('home.admin')->with('success', 'Admin login successful!');
+            } else {
+                return redirect()->route('user.dashboard')->with('success', 'Login successful!');
+            }
         } else {
             // Invalid credentials
             return back()->with('error', 'Invalid username or password.');
