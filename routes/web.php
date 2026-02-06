@@ -97,6 +97,10 @@ Route::get('/add-user', function () {
     return view('portals.add-user');
 })->middleware(['auth', 'admin'])->name('add-user.portal');
 
+Route::post('/add-user', [AdminController::class, 'storeResident'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.store-resident');
+
 Route::get('/agri-dashboard', function () {
     return view('portals.agriculture-cert');
 })->middleware(['auth', 'admin'])->name('dashboard.agriculture');
