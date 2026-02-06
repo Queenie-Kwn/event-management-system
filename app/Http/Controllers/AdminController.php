@@ -224,9 +224,51 @@ class AdminController extends Controller
         $residents = User::where('role', '!=', 'admin')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
-            ->get();
+            ->paginate(10);
             
         return view('admin.residents-map', compact('residents'));
+    }
+
+    public function storeResident(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:150',
+            'last_name' => 'required|string|max:150',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'birthdate' => 'required|date',
+            'civil_status' => 'required|string|max:20',
+            'purok' => 'required|string|max:100',
+            'full_address' => 'required|string|max:500',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'cash_assistance_programs' => 'required|string|max:255',
+        ]);
+
+        $age = \Carbon\Carbon::parse($request->birthdate)->age;
+        $fullName = trim($request->first_name . ' ' . ($request->middle_name ?? '') . ' ' . $request->last_name . ' ' . ($request->suffix ?? ''));
+        
+        User::create([
+            'name' => $fullName,
+            'email' => $request->email,
+            'password' => $request->password,
+            'role' => 'resident',
+            'age' => $age,
+            'civil_status' => $request->civil_status,
+            'purok' => $request->purok,
+            'barangay' => 'Bagacay',
+            'city' => 'Dumaguete City',
+            'full_address' => $request->full_address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'is_indigent' => $request->cash_assistance_programs,
+            'purpose' => 'Resident Registration',
+            'date_issued' => $request->date_issued ?? now()->format('Y-m-d'),
+        ]);
+
+        $this->logActivity('ADD_RESIDENT', "Added new resident: {$fullName}");
+
+        return redirect()->route('add-user.portal')->with('success', 'Resident registered successfully!');
     }
 
     

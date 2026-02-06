@@ -205,6 +205,29 @@
         'Purok Fuente': [9.3080, 123.3040]
     };
     
+    // Cash assistance program colors
+    const programColors = {
+        'Pantawid Pamilyang Pilipino Program (4Ps)': '#ef4444',
+        'Targeted Cash Transfers (TCT)': '#3b82f6',
+        'Sustainable Livelihood Program (SLP)': '#f97316',
+        'Assistance to Individuals in Crisis Situations (AICS)': '#eab308'
+    };
+    
+    // Create custom colored icon
+    function createColoredIcon(color) {
+        return L.divIcon({
+            className: 'custom-marker',
+            html: `<svg width="32" height="42" viewBox="0 0 32 42" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 26 16 26s16-14 16-26C32 7.163 24.837 0 16 0z" 
+                          fill="${color}" stroke="white" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="6" fill="white"/>
+                   </svg>`,
+            iconSize: [32, 42],
+            iconAnchor: [16, 42],
+            popupAnchor: [0, -42]
+        });
+    }
+    
     // Initialize Leaflet Map
     function initMap() {
         const defaultLocation = [9.3077, 123.3026]; // Dumaguete City
@@ -215,7 +238,10 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
         
-        marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
+        marker = L.marker(defaultLocation, { 
+            draggable: true,
+            icon: createColoredIcon('#6b7280')
+        }).addTo(map);
         
         // Update coordinates when marker is dragged
         marker.on('dragend', function() {
@@ -273,9 +299,24 @@
         document.getElementById('longitude').value = lng.toFixed(6);
     }
     
+    // Update marker color based on selected program
+    function updateMarkerColor() {
+        const programSelect = document.getElementById('cash_assistance_programs');
+        const selectedProgram = programSelect.value;
+        
+        if (selectedProgram && programColors[selectedProgram]) {
+            const color = programColors[selectedProgram];
+            const position = marker.getLatLng();
+            marker.setIcon(createColoredIcon(color));
+        }
+    }
+    
     // Initialize map when page loads
     document.addEventListener('DOMContentLoaded', function() {
         initMap();
+        
+        // Add event listener to cash assistance program dropdown
+        document.getElementById('cash_assistance_programs').addEventListener('change', updateMarkerColor);
     });
     
     // Clear all text inputs on page load

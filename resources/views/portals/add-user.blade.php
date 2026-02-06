@@ -15,7 +15,24 @@
         Register Resident
     </h2>
 
-    <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @if(session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('admin.store-resident') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @csrf
 
         <!-- First Name -->
         <div>
@@ -90,7 +107,7 @@
         <!-- Purok -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Purok</label>
-            <select name="purok"
+            <select name="purok" id="purok" onchange="updateMapByPurok()"
                    class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
                 <option value="">Select Purok</option>
                 <option value="Purok Mahigugma-on">Purok Mahigugma-on</option>
@@ -156,7 +173,7 @@
                 Cancel
             </a>
 
-            <button type="button"
+            <button type="submit"
                     class="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">
                 Register Resident
             </button>
@@ -167,6 +184,14 @@
 
 <script>
     let map, marker;
+    
+    const purokLocations = {
+        'Purok Mahigugma-on': [9.3085, 123.3030],
+        'Purok Gumamela': [9.3070, 123.3020],
+        'Purok Santol': [9.3090, 123.3015],
+        'Purok Cebasca': [9.3065, 123.3035],
+        'Purok Fuente': [9.3080, 123.3040]
+    };
     
     function initMap() {
         const bagacay = [9.2833, 123.2833];
@@ -190,6 +215,18 @@
         });
         
         updateCoordinates(bagacay[0], bagacay[1]);
+    }
+    
+    function updateMapByPurok() {
+        const purokSelect = document.getElementById('purok');
+        const selectedPurok = purokSelect.value;
+        
+        if (selectedPurok && purokLocations[selectedPurok]) {
+            const location = purokLocations[selectedPurok];
+            map.setView(location, 17);
+            marker.setLatLng(location);
+            updateCoordinates(location[0], location[1]);
+        }
     }
     
     function getCurrentLocation() {
