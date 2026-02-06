@@ -15,7 +15,7 @@
         
         <div class="p-6">
             <!-- Map Container -->
-            <div id="residentsMap" class="w-full h-96 bg-gray-200 rounded-xl mb-6"></div>
+            <div id="residentsMap" class="w-full h-96 bg-gray-200 rounded-xl mb-6 relative z-0"></div>
             
             <!-- Residents List -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -49,9 +49,9 @@
     let map, markers = [];
     
     function initResidentsMap() {
-        const dumaguete = [9.3077, 123.3026];
+        const bagacay = [9.2833, 123.2833];
         
-        map = L.map('residentsMap').setView(dumaguete, 13);
+        map = L.map('residentsMap').setView(bagacay, 15);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'

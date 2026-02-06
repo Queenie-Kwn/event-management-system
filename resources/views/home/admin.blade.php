@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard')</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
@@ -15,13 +16,8 @@
 
     @include('partials.splash')
 
-    <!-- Mobile menu button -->
-    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-50 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 rounded-2xl shadow-lg">
-        <i data-feather="menu" class="w-5 h-5"></i>
-    </button>
-
     <!-- Sidebar -->
-    <div id="sidebar" class="w-72 bg-white/90 backdrop-blur-sm border-r border-white/20 flex-shrink-0 shadow-xl fixed left-0 top-0 h-screen overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40">
+    <div id="sidebar" class="w-72 bg-white/90 backdrop-blur-sm border-r border-white/20 flex-shrink-0 shadow-xl fixed left-0 top-0 h-screen flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40">
         <div class="p-8 text-center">
             <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg">
                 <i data-feather="map-pin" class="w-8 h-8 text-white"></i>
@@ -30,17 +26,19 @@
             <p class="text-sm text-blue-500 font-light">Management System</p>
         </div>
 
-        <nav class="px-6 space-y-2">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 py-3 px-4 rounded-2xl {{ request()->routeIs('admin.dashboard') ? 'bg-blue-100 text-blue-700' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
-                <i data-feather="home" class="w-5 h-5"></i>
-                <span class="font-medium">Dashboard</span>
-            </a>
+        <!-- Scrollable navigation area -->
+        <div class="flex-1 overflow-y-auto">
+            <nav class="px-6 space-y-2">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 py-3 px-4 rounded-2xl {{ request()->routeIs('admin.dashboard') ? 'bg-blue-100 text-blue-700' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
+                    <i data-feather="home" class="w-5 h-5"></i>
+                    <span class="font-medium">Dashboard</span>
+                </a>
 
-            <a href="{{ route('dashboard.document-requests') }}" class="flex items-center gap-3 py-3 px-4 rounded-2xl {{ request()->routeIs('dashboard.document-requests') ? 'bg-blue-100 text-blue-700' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
-                <i data-feather="file-text" class="w-5 h-5"></i>
-                <span class="font-medium">Document Requests</span>
-            </a>
-        </nav>
+                <a href="{{ route('dashboard.document-requests') }}" class="flex items-center gap-3 py-3 px-4 rounded-2xl {{ request()->routeIs('dashboard.document-requests') ? 'bg-blue-100 text-blue-700' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
+                    <i data-feather="file-text" class="w-5 h-5"></i>
+                    <span class="font-medium">Document Requests</span>
+                </a>
+            </nav>
 
         @php
             $documentsOpen =
@@ -142,9 +140,10 @@
                 </a>
             </div>
         </div>
+        </div>
 
         <!-- Profile section at bottom -->
-        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-r from-blue-50 to-blue-100 backdrop-blur-sm border-t border-blue-200">
+        <div class="flex-shrink-0 p-6 bg-gradient-to-r from-blue-50 to-blue-100 backdrop-blur-sm border-t border-blue-200">
             <div class="relative">
                 <button id="sidebarProfileBtn" class="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-blue-100 transition-all duration-200 focus:outline-none">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
@@ -171,8 +170,13 @@
     <!-- Main content -->
     <main class="flex-1 lg:ml-72 ml-0">
         <!-- Header -->
-        <header class="bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200 shadow-sm p-6 mb-8 flex justify-between items-center">
-            <h1 class="text-2xl lg:text-3xl font-bold text-blue-800 tracking-tight">Barangay Bagacay Management System</h1>
+        <header class="sticky top-0 z-30 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200 shadow-sm p-6 mb-8 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button id="mobileMenuBtn" class="lg:hidden bg-gradient-to-r from-blue-600 to-blue-700 text-white p-2 rounded-xl shadow-lg">
+                    <i data-feather="menu" class="w-5 h-5"></i>
+                </button>
+                <h1 class="text-2xl lg:text-3xl font-bold text-blue-800 tracking-tight">Barangay Bagacay Management System</h1>
+            </div>
 
             <div class="flex items-center gap-2 text-blue-700">
                 <i data-feather="calendar" class="w-5 h-5"></i>

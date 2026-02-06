@@ -11,13 +11,24 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+      display: none;
+    }
+    input[type="password"]::-webkit-credentials-auto-fill-button,
+    input[type="password"]::-webkit-contacts-auto-fill-button {
+      visibility: hidden;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen flex items-center justify-center p-4 sm:p-6">
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen flex items-center justify-center p-4">
 
   @include('partials.splash')
 
-  <div class="bg-white/80 backdrop-blur-sm w-full max-w-5xl rounded-3xl shadow-xl border border-white/20 p-6 sm:p-8">
+  <div class="bg-white/80 backdrop-blur-sm w-full max-w-6xl rounded-3xl shadow-xl border border-white/20 p-4 sm:p-6 md:p-8">
 
    <div class="flex flex-col items-center mb-6">
       <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center mb-4 shadow-lg">
@@ -54,7 +65,7 @@
 
     <form action="{{ route('signup.store') }}" method="POST" class="space-y-4">
         @csrf
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <div>
                 <label for="first_name" class="block text-sm font-medium text-slate-700 mb-2">First Name</label>
                 <input type="text" name="first_name" id="first_name" placeholder="First Name" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
@@ -69,7 +80,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <div>
                 <label for="suffix" class="block text-sm font-medium text-slate-700 mb-2">Suffix</label>
                 <input type="text" name="suffix" id="suffix" placeholder="Jr., Sr., III (optional)" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200">
@@ -87,14 +98,14 @@
         <div>
             <label for="password" class="block text-sm font-medium text-slate-700 mb-2">Password</label>
             <div class="relative">
-                <input type="password" name="password" id="password" placeholder="Password" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 pr-12 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
+                <input type="password" name="password" id="password" placeholder="Password" autocomplete="new-password" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 pr-12 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
                 <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
                     <i data-feather="eye" id="eyeIcon" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <div>
                 <label for="birthdate" class="block text-sm font-medium text-slate-700 mb-2">Birthdate</label>
                 <input type="date" name="birthdate" id="birthdate" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
@@ -111,7 +122,7 @@
             </div>
             <div>
                 <label for="purok" class="block text-sm font-medium text-slate-700 mb-2">Purok</label>
-                <select name="purok" id="purok" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
+                <select name="purok" id="purok" onchange="updateMapByPurok()" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
                     <option value="">Select Purok</option>
                     <option value="Purok Mahigugma-on">Purok Mahigugma-on</option>
                     <option value="Purok Gumamela">Purok Gumamela</option>
@@ -185,6 +196,15 @@
   <script>
     let map, marker;
     
+    // Purok coordinates
+    const purokLocations = {
+        'Purok Mahigugma-on': [9.3085, 123.3030],
+        'Purok Gumamela': [9.3070, 123.3020],
+        'Purok Santol': [9.3090, 123.3015],
+        'Purok Cebasca': [9.3065, 123.3035],
+        'Purok Fuente': [9.3080, 123.3040]
+    };
+    
     // Initialize Leaflet Map
     function initMap() {
         const defaultLocation = [9.3077, 123.3026]; // Dumaguete City
@@ -211,6 +231,19 @@
         
         // Set initial coordinates
         updateCoordinates(defaultLocation[0], defaultLocation[1]);
+    }
+    
+    // Update map based on selected purok
+    function updateMapByPurok() {
+        const purokSelect = document.getElementById('purok');
+        const selectedPurok = purokSelect.value;
+        
+        if (selectedPurok && purokLocations[selectedPurok]) {
+            const location = purokLocations[selectedPurok];
+            map.setView(location, 17);
+            marker.setLatLng(location);
+            updateCoordinates(location[0], location[1]);
+        }
     }
     
     // Get current location

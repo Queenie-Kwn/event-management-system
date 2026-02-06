@@ -4,9 +4,9 @@
 
 @section('content')
 
-<div class="flex gap-6 p-6">
+<div class="flex flex-col md:flex-row gap-6 p-6">
     <!-- LEFT PANEL - FORM -->
-    <div class="w-1/3">
+    <div class="w-full md:w-1/3">
         <div class="bg-white rounded-2xl shadow-lg p-6">
             <h3 class="text-xl font-bold text-slate-800 mb-6">Certificate Information</h3>
             
@@ -43,32 +43,9 @@
                     <input type="text" id="purpose" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="whatever legal purpose it may serve">
                 </div>
                 
-                <div class="grid grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Day</label>
-                        <input type="number" id="day" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" min="1" max="31">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Month</label>
-                        <select id="month" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-                            <option value="January">January</option>
-                            <option value="February">February</option>
-                            <option value="March">March</option>
-                            <option value="April">April</option>
-                            <option value="May">May</option>
-                            <option value="June">June</option>
-                            <option value="July">July</option>
-                            <option value="August">August</option>
-                            <option value="September">September</option>
-                            <option value="October">October</option>
-                            <option value="November">November</option>
-                            <option value="December">December</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Year</label>
-                        <input type="number" id="year" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" min="2020" max="2030">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Date Issued</label>
+                    <input type="date" id="dateIssued" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                 </div>
                 
                 <button type="button" onclick="window.print()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200">
@@ -79,7 +56,7 @@
     </div>
     
     <!-- RIGHT PANEL - PREVIEW -->
-    <div class="w-2/3">
+    <div class="w-full lg:w-2/3">
         <div class="bg-white rounded-2xl shadow-lg p-6">
             <h3 class="text-xl font-bold text-slate-800 mb-6">Certificate Preview</h3>
             
@@ -125,9 +102,7 @@
                     </p>
                     
                     <p>
-                        Issued this <span id="previewDay" class="underline">___</span>
-                        day of <span id="previewMonth" class="underline">_________</span>,
-                        <span id="previewYear" class="underline">____</span>,
+                        Issued this <span id="previewDate" class="underline">__/__/____</span>,
                         at the office of the Barangay Captain, Barangay Bagacay,
                         Dumaguete City.
                     </p>
@@ -143,25 +118,21 @@
 </div>
 
 <script>
-    // Initialize with current date
     const today = new Date();
-    document.getElementById('day').value = today.getDate();
-    document.getElementById('month').value = today.toLocaleString('default', { month: 'long' });
-    document.getElementById('year').value = today.getFullYear();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('dateIssued').value = `${yyyy}-${mm}-${dd}`;
     
-    // Update preview
     updatePreview();
     
-    // Add event listeners
     document.getElementById('firstName').addEventListener('input', updatePreview);
     document.getElementById('middleName').addEventListener('input', updatePreview);
     document.getElementById('lastName').addEventListener('input', updatePreview);
     document.getElementById('suffix').addEventListener('input', updatePreview);
     document.getElementById('age').addEventListener('input', updatePreview);
     document.getElementById('purpose').addEventListener('input', updatePreview);
-    document.getElementById('day').addEventListener('input', updatePreview);
-    document.getElementById('month').addEventListener('change', updatePreview);
-    document.getElementById('year').addEventListener('input', updatePreview);
+    document.getElementById('dateIssued').addEventListener('input', updatePreview);
     
     function updatePreview() {
         const firstName = document.getElementById('firstName').value;
@@ -177,9 +148,14 @@
         document.getElementById('previewName').textContent = fullName || '_________________';
         document.getElementById('previewAge').textContent = document.getElementById('age').value || '___';
         document.getElementById('previewPurpose').textContent = document.getElementById('purpose').value || 'whatever legal purpose it may serve him best';
-        document.getElementById('previewDay').textContent = document.getElementById('day').value || '___';
-        document.getElementById('previewMonth').textContent = document.getElementById('month').value || '_________';
-        document.getElementById('previewYear').textContent = document.getElementById('year').value || '____';
+        
+        const dateValue = document.getElementById('dateIssued').value;
+        if (dateValue) {
+            const [year, month, day] = dateValue.split('-');
+            document.getElementById('previewDate').textContent = `${month}/${day}/${year}`;
+        } else {
+            document.getElementById('previewDate').textContent = '__/__/____';
+        }
     }
 </script>
 

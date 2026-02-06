@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Barangay Bagacay</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
@@ -78,7 +79,7 @@
                             <span class="text-sm font-medium text-gray-700">Online</span>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <div class="text-right">
+                            <div class="text-right hidden md:block">
                                 <p class="text-sm font-semibold text-gray-800">{{ $user->name }}</p>
                                 <p class="text-xs text-gray-600">{{ $user->purok }}</p>
                             </div>

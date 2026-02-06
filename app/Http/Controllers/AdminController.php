@@ -86,17 +86,17 @@ class AdminController extends Controller
      */
     public function residentsList(Request $request)
     {
-        $query = Resident::query();
+        $query = User::where('role', 'resident');
 
         // Search by name or email
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('full_name', 'like', '%' . $request->search . '%')
+                $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
-        $residents = $query->orderBy('full_name')->get();
+        $residents = $query->orderBy('name')->get();
 
         return view('portals.residents-list', compact('residents'));
     }
