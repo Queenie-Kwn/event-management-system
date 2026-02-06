@@ -30,6 +30,11 @@ Route::post('/signup', [SignupController::class, 'store'])->name('signup.store')
 //Login Route Process
 Route::post('/login-user', [SignupController::class, 'LoginUser'])->name('login.user');
 
+//Login Page
+Route::get('/login', function () {
+    return view('welcome');
+})->name('login');
+
 //Logout Route
 Route::post('/logout', function () {
     Auth::logout();

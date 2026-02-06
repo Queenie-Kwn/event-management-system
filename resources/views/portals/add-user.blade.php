@@ -4,6 +4,9 @@
 
 @section('content')
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 
 
 <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-8">
@@ -12,145 +15,142 @@
         Register Resident
     </h2>
 
-    <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        
-        <!-- Full Name (NOW 2ND COLUMN) -->
-       
-
-
-        <!-- Name -->
-      <form class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <!-- Profile Upload (LEFT COLUMN) -->
-         
-        <div class="md:row-span-3 flex flex-col items-start justify-start">
-
-            <div class="w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 overflow-hidden">
-                <img id="photoPreview"
-                    class="hidden w-full h-full object-cover"
-                    alt="Profile Preview">
-
-                <span id="photoPlaceholder" class="text-gray-400 text-sm text-center">
-                    Profile Photo
-                </span>
-            </div>
-
-
-
-           <input type="file"
-            accept="image/*"
-            onchange="previewPhoto(event)"
-            class="block w-full text-sm text-gray-600
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:bg-blue-600 file:text-white
-            hover:file:bg-blue-700">
-
-
-                <br>             
-                    <label class="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text"
-                        class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+        <!-- First Name -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">First Name</label>
+            <input type="text" name="first_name"
+                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
-        <!-- Full Name (NOW 2ND COLUMN) -->
-       
+        <!-- Middle Name -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Middle Name</label>
+            <input type="text" name="middle_name"
+                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+        </div>
+
+        <!-- Last Name -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Last Name</label>
+            <input type="text" name="last_name"
+                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
+        </div>
+
+        <!-- Suffix -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Suffix</label>
+            <input type="text" name="suffix" placeholder="Jr., Sr., III (optional)"
+                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+        </div>
 
 
         <!-- Email -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email"
-                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+            <input type="email" name="email"
+                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
+        </div>
+
+        <!-- Contact Number -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Contact Number</label>
+            <input type="tel" name="contact_number"
+                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
         <!-- Password -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password"
-                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+            <input type="password" name="password"
+                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
-        <!-- Role -->
+        <!-- Birthdate -->
         <div>
-            <label class="block text-sm font-medium text-gray-700">Role</label>
-            <select
-                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-                <option value="">Select role</option>
-                <option>Resident</option>
-                <option>Admin</option>
-            </select>
-        </div>
-
-        <!-- Age -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Age</label>
-            <input type="number"
-                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+            <label class="block text-sm font-medium text-gray-700">Birthdate</label>
+            <input type="date" name="birthdate"
+                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
         <!-- Civil Status -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Civil Status</label>
-            <select
-                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+            <select name="civil_status"
+                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
                 <option value="">Select status</option>
                 <option>Single</option>
                 <option>Married</option>
+                <option>Divorced</option>
                 <option>Widowed</option>
-                <option>Separated</option>
             </select>
         </div>
 
         <!-- Purok -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Purok</label>
-            <input type="text"
-                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-        </div>
-
-        <!-- Barangay -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Barangay</label>
-            <input type="text" value="Bagacay" readonly
-                   class="mt-1 w-full border bg-gray-100 rounded-md px-3 py-2">
-        </div>
-
-        <!-- City -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">City</label>
-            <input type="text" value="Dumaguete City" readonly
-                   class="mt-1 w-full border bg-gray-100 rounded-md px-3 py-2">
-        </div>
-
-        <!-- Indigent -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Indigent</label>
-            <select
-                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-                <option value="">Select</option>
-                <option value="1">Yes</option>
-                <option value="0">No</option>
+            <select name="purok"
+                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
+                <option value="">Select Purok</option>
+                <option value="Purok Mahigugma-on">Purok Mahigugma-on</option>
+                <option value="Purok Gumamela">Purok Gumamela</option>
+                <option value="Purok Santol">Purok Santol</option>
+                <option value="Purok Cebasca">Purok Cebasca</option>
+                <option value="Purok Fuente">Purok Fuente</option>
             </select>
         </div>
 
-        <!-- Purpose -->
-        <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700">Purpose</label>
-            <textarea rows="3"
-                      class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"></textarea>
+        <!-- Full Address -->
+        <div class="md:col-span-2 lg:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Full Address</label>
+            <textarea name="full_address" rows="3"
+                      class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required></textarea>
+        </div>
+
+        <!-- Geo-tagging Section -->
+        <div class="md:col-span-2 lg:col-span-3 bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div class="flex items-center justify-between mb-3">
+                <label class="block text-sm font-medium text-gray-700">Location (Geo-tagging)</label>
+                <button type="button" onclick="getCurrentLocation()" class="bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700">
+                    Get Current Location
+                </button>
+            </div>
+            <div id="map" class="w-full h-64 bg-gray-200 rounded-md mb-3 relative z-0"></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">Latitude</label>
+                    <input type="text" name="latitude" id="latitude" readonly class="w-full bg-white border rounded-md px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">Longitude</label>
+                    <input type="text" name="longitude" id="longitude" readonly class="w-full bg-white border rounded-md px-3 py-2 text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Cash Assistance Programs -->
+        <div class="md:col-span-2 lg:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Cash Assistance Programs</label>
+            <select name="cash_assistance_programs"
+                class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
+                <option value="">Select Cash Assistance Program</option>
+                <option value="Pantawid Pamilyang Pilipino Program (4Ps)">Pantawid Pamilyang Pilipino Program (4Ps)</option>
+                <option value="Assistance to Individuals in Crisis Situations (AICS)">Assistance to Individuals in Crisis Situations (AICS)</option>
+                <option value="Sustainable Livelihood Program (SLP)">Sustainable Livelihood Program (SLP)</option>
+                <option value="Targeted Cash Transfers (TCT)">Targeted Cash Transfers (TCT)</option>
+            </select>
         </div>
 
         <!-- Date Issued -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Date Issued</label>
-            <input type="date"
+            <input type="date" name="date_issued"
                    class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
         </div>
 
         <!-- Buttons -->
-        <div class="md:col-span-2 flex justify-end gap-4 mt-6">
+        <div class="md:col-span-2 lg:col-span-3 flex justify-end gap-4 mt-6">
             <a href="{{ url()->previous() }}"
                class="px-6 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100">
                 Cancel
@@ -166,17 +166,60 @@
 </div>
 
 <script>
-    function previewPhoto(event) {
-        const img = document.getElementById('photoPreview');
-        const placeholder = document.getElementById('photoPlaceholder');
-
-        const file = event.target.files[0];
-        if (!file) return;
-
-        img.src = URL.createObjectURL(file);
-        img.classList.remove('hidden');
-        placeholder.classList.add('hidden');
+    let map, marker;
+    
+    function initMap() {
+        const bagacay = [9.2833, 123.2833];
+        
+        map = L.map('map').setView(bagacay, 15);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        marker = L.marker(bagacay, { draggable: true }).addTo(map);
+        
+        marker.on('dragend', function() {
+            const position = marker.getLatLng();
+            updateCoordinates(position.lat, position.lng);
+        });
+        
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateCoordinates(e.latlng.lat, e.latlng.lng);
+        });
+        
+        updateCoordinates(bagacay[0], bagacay[1]);
     }
+    
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    map.setView([lat, lng], 16);
+                    marker.setLatLng([lat, lng]);
+                    updateCoordinates(lat, lng);
+                },
+                function(error) {
+                    alert('Error getting location: ' + error.message);
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by this browser.');
+        }
+    }
+    
+    function updateCoordinates(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
 </script>
 
 

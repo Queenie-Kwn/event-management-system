@@ -26,19 +26,66 @@
                     <p class="text-sm text-gray-500">Fill out the form to request your document</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-700">{{ Auth::user()->name }}</span>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
+            <div class="flex items-center space-x-3">
+                <div class="text-right hidden md:block">
+                    <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-600">{{ Auth::user()->purok }}</p>
+                </div>
+                <div class="relative">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                    <button onclick="toggleProfileMenu()" class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform">
+                        <i data-feather="chevron-down" class="w-3 h-3 text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Dropdown -->
+        <div id="profileMenu" class="absolute right-4 top-20 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 hidden animate-fade-in">
+            <div class="p-4 border-b border-gray-100">
+                <p class="font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
+            </div>
+            <div class="p-2">
+                <a href="{{ route('user.requests') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i data-feather="file-text" class="w-4 h-4 text-blue-600"></i>
+                    <span class="text-sm font-medium">My Requests</span>
+                </a>
+                <form action="{{ route('logout') }}" method="POST" class="w-full">
                     @csrf
-                    <button type="submit" class="text-sm text-red-600 hover:text-red-800">Logout</button>
+                    <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors">
+                        <i data-feather="log-out" class="w-4 h-4"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </button>
                 </form>
             </div>
         </div>
     </header>
 
-    <div class="flex gap-6 p-6">
+    <!-- Profile Menu Script -->
+    <script>
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('profileMenu');
+            const button = e.target.closest('[onclick="toggleProfileMenu()"]');
+            if (!button && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
+        </div>
+    </header>
+
+    <div class="flex flex-col md:flex-row gap-6 p-6">
         <!-- LEFT PANEL - FORM -->
-        <div class="w-1/3 bg-white rounded-2xl shadow-lg p-6">
+        <div class="w-full md:w-1/3 bg-white rounded-2xl shadow-lg p-6">
             <h3 class="text-xl font-bold text-slate-800 mb-6">Certificate Details</h3>
             
             <form action="{{ route('user.request.document') }}" method="POST" class="space-y-4">
@@ -100,12 +147,12 @@
         </div>
         
         <!-- RIGHT PANEL - PREVIEW -->
-        <div class="w-2/3">
+        <div class="w-full md:w-2/3">
             <div class="bg-white rounded-2xl shadow-lg p-6">
                 <h3 class="text-xl font-bold text-slate-800 mb-6">Certificate Preview</h3>
                 
                 <!-- CERTIFICATE PREVIEW -->
-                <div class="bond-paper bg-white border-2 border-slate-200 p-12 mx-auto relative" style="width: 600px; min-height: 800px; transform: scale(0.8); transform-origin: top;">
+                <div class="bond-paper bg-white border-2 border-slate-200 p-6 sm:p-12 mx-auto relative overflow-x-auto" style="max-width: 600px; min-height: 400px;">
                     
                     <!-- WATERMARK -->
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10">

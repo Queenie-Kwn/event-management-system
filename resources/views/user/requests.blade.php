@@ -66,16 +66,63 @@
                             <p class="text-sm text-gray-600 font-medium">Track your application status</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm font-medium text-gray-700">{{ Auth::user()->name }}</span>
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="text-sm text-red-600 hover:text-red-800 font-medium">Logout</button>
-                        </form>
+                    <div class="flex items-center space-x-3">
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-gray-600">{{ Auth::user()->purok }}</p>
+                        </div>
+                        <div class="relative">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            </div>
+                            <button onclick="toggleProfileMenu()" class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform">
+                                <i data-feather="chevron-down" class="w-3 h-3 text-gray-600"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Profile Dropdown -->
+            <div id="profileMenu" class="absolute right-4 top-20 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 hidden animate-fade-in">
+                <div class="p-4 border-b border-gray-100">
+                    <p class="font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                    <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
+                </div>
+                <div class="p-2">
+                    <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                        <i data-feather="home" class="w-4 h-4 text-blue-600"></i>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="w-full">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors">
+                            <i data-feather="log-out" class="w-4 h-4"></i>
+                            <span class="text-sm font-medium">Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </header>
+
+        </header>
+
+        <!-- Profile Menu Script -->
+        <script>
+            function toggleProfileMenu() {
+                const menu = document.getElementById('profileMenu');
+                menu.classList.toggle('hidden');
+            }
+            
+            // Close profile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                const menu = document.getElementById('profileMenu');
+                const button = e.target.closest('[onclick="toggleProfileMenu()"]');
+                if (!button && !menu.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        </script>
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -194,6 +241,15 @@
         </main>
     </div>
 
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-3xl p-8 shadow-2xl text-center animate-fade-in">
+            <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Loading...</h3>
+            <p class="text-gray-600">Please wait while we fetch your request details</p>
+        </div>
+    </div>
+
     <!-- Request Details Modal -->
     <div id="requestModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border-0 w-96 animate-fade-in">
@@ -219,10 +275,20 @@
     <script>
         feather.replace();
         
+        function showLoading() {
+            document.getElementById('loadingModal').classList.remove('hidden');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingModal').classList.add('hidden');
+        }
+        
         function viewRequestDetails(requestId) {
+            showLoading();
             fetch(`/user/request-status/${requestId}`)
                 .then(response => response.json())
                 .then(data => {
+                    hideLoading();
                     const statusColor = data.status === 'approved' ? 'text-green-600' : 
                                       data.status === 'rejected' ? 'text-red-600' : 'text-orange-600';
                     const statusBg = data.status === 'approved' ? 'bg-green-50 border-green-200' : 
@@ -255,6 +321,7 @@
                     feather.replace();
                 })
                 .catch(error => {
+                    hideLoading();
                     console.error('Error:', error);
                     alert('Error loading request details');
                 });

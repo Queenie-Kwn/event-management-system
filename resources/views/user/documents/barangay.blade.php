@@ -14,62 +14,109 @@
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
 
     <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-sm border-b border-white/20 shadow-sm p-6 mb-8">
-        <div class="flex items-center justify-between">
+    <header class="bg-white/80 backdrop-blur-sm border-b border-white/20 shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
+        <div class="flex items-center justify-between flex-wrap gap-4">
             <div class="flex items-center">
-                <a href="{{ route('user.dashboard') }}" class="mr-4 text-gray-500 hover:text-gray-700">
+                <a href="{{ route('user.dashboard') }}" class="mr-2 sm:mr-4 text-gray-500 hover:text-gray-700">
                     <i data-feather="arrow-left" class="w-5 h-5"></i>
                 </a>
-                <img src="{{ asset('images/barangay_logo.jpg') }}" alt="Logo" class="w-10 h-10 rounded-full mr-3">
+                <img src="{{ asset('images/barangay_logo.jpg') }}" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 sm:mr-3">
                 <div>
-                    <h1 class="text-xl font-semibold text-gray-900">Request Barangay Certification</h1>
-                    <p class="text-sm text-gray-500">Fill out the form to request your document</p>
+                    <h1 class="text-base sm:text-xl font-semibold text-gray-900">Request Barangay Certification</h1>
+                    <p class="text-xs sm:text-sm text-gray-500 hidden sm:block">Fill out the form to request your document</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-700">{{ Auth::user()->name }}</span>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
+            <div class="flex items-center space-x-3">
+                <div class="text-right hidden md:block">
+                    <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-600">{{ Auth::user()->purok }}</p>
+                </div>
+                <div class="relative">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                    <button onclick="toggleProfileMenu()" class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform">
+                        <i data-feather="chevron-down" class="w-3 h-3 text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Dropdown -->
+        <div id="profileMenu" class="absolute right-4 top-20 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 hidden animate-fade-in">
+            <div class="p-4 border-b border-gray-100">
+                <p class="font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
+            </div>
+            <div class="p-2">
+                <a href="{{ route('user.requests') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i data-feather="file-text" class="w-4 h-4 text-blue-600"></i>
+                    <span class="text-sm font-medium">My Requests</span>
+                </a>
+                <form action="{{ route('logout') }}" method="POST" class="w-full">
                     @csrf
-                    <button type="submit" class="text-sm text-red-600 hover:text-red-800">Logout</button>
+                    <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors">
+                        <i data-feather="log-out" class="w-4 h-4"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </button>
                 </form>
             </div>
         </div>
     </header>
 
-    <div class="flex gap-6 p-6">
+    <!-- Profile Menu Script -->
+    <script>
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('profileMenu');
+            const button = e.target.closest('[onclick="toggleProfileMenu()"]');
+            if (!button && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
+        </div>
+    </header>
+
+    <div class="flex flex-col lg:flex-row gap-4 sm:gap-6 p-4 sm:p-6">
         <!-- LEFT PANEL - FORM -->
-        <div class="w-1/3 bg-white rounded-2xl shadow-lg p-6">
-            <h3 class="text-xl font-bold text-slate-800 mb-6">Certificate Details</h3>
+        <div class="w-full lg:w-1/3 bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-4 sm:mb-6">Certificate Details</h3>
             
-            <form action="{{ route('user.request.document') }}" method="POST" class="space-y-4">
+            <form action="{{ route('user.request.document') }}" method="POST" class="space-y-3 sm:space-y-4">
                 @csrf
                 <input type="hidden" name="document_type" value="Barangay Certification">
                 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">First Name</label>
-                        <input type="text" id="firstName" name="first_name" value="{{ explode(' ', Auth::user()->name)[0] ?? '' }}" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="First name" required>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-2">First Name</label>
+                        <input type="text" id="firstName" name="first_name" value="{{ explode(' ', Auth::user()->name)[0] ?? '' }}" class="w-full bg-slate-50 border-0 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="First name" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Middle Name</label>
-                        <input type="text" id="middleName" name="middle_name" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Middle name">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Middle Name</label>
+                        <input type="text" id="middleName" name="middle_name" class="w-full bg-slate-50 border-0 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Middle name">
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
-                        <input type="text" id="lastName" name="last_name" value="{{ explode(' ', Auth::user()->name)[1] ?? '' }}" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Last name" required>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Last Name</label>
+                        <input type="text" id="lastName" name="last_name" value="{{ explode(' ', Auth::user()->name)[1] ?? '' }}" class="w-full bg-slate-50 border-0 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Last name" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Suffix</label>
-                        <input type="text" id="suffix" name="suffix" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Jr., Sr., III">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Suffix</label>
+                        <input type="text" id="suffix" name="suffix" class="w-full bg-slate-50 border-0 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Jr., Sr., III">
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Purok</label>
-                    <select id="purok" name="purok" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                    <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Purok</label>
+                    <select id="purok" name="purok" class="w-full bg-slate-50 border-0 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                         <option value="Purok Mahigugma-on" {{ Auth::user()->purok == 'Purok Mahigugma-on' ? 'selected' : '' }}>Purok Mahigugma-on</option>
                         <option value="Purok Gumamela" {{ Auth::user()->purok == 'Purok Gumamela' ? 'selected' : '' }}>Purok Gumamela</option>
                         <option value="Purok Santol" {{ Auth::user()->purok == 'Purok Santol' ? 'selected' : '' }}>Purok Santol</option>
@@ -79,27 +126,27 @@
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Purpose</label>
-                    <input type="text" id="purpose" name="purpose" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Enter purpose" required>
+                    <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Purpose</label>
+                    <input type="text" id="purpose" name="purpose" class="w-full bg-slate-50 border-0 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Enter purpose" required>
                 </div>
                 
-                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200">
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 sm:py-3 rounded-xl text-sm sm:text-base font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200">
                     Submit Request
                 </button>
             </form>
         </div>
         
         <!-- RIGHT PANEL - PREVIEW -->
-        <div class="w-2/3">
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-slate-800 mb-6">Certificate Preview</h3>
+        <div class="w-full lg:w-2/3">
+            <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-4 sm:mb-6">Certificate Preview</h3>
                 
                 <!-- CERTIFICATE PREVIEW -->
-                <div class="bond-paper bg-white border-2 border-slate-200 p-12 mx-auto relative" style="width: 600px; min-height: 800px; transform: scale(0.8); transform-origin: top;">
+                <div class="bond-paper bg-white border-2 border-slate-200 p-6 sm:p-12 mx-auto relative overflow-x-auto" style="max-width: 600px; min-height: 400px;">
                     
                     <!-- WATERMARK -->
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10">
-                        <img src="{{ asset('images/barangay_logo.jpg') }}" class="w-[400px]" alt="Watermark">
+                        <img src="{{ asset('images/barangay_logo.jpg') }}" class="w-48 sm:w-[400px]" alt="Watermark">
                     </div>
                     
                     <!-- HEADER -->

@@ -36,7 +36,6 @@
                     <th class="px-4 py-3 text-left">Age</th>
                     <th class="px-4 py-3 text-left">Civil Status</th>
                     <th class="px-4 py-3 text-left">Purok</th>
-                    <th class="px-4 py-3 text-left">Role</th>
                     <th class="px-4 py-3 text-center">Actions</th>
                 </tr>
             </thead>
@@ -45,21 +44,20 @@
 
                 @forelse ($residents as $resident)
                     <tr class="border-t hover:bg-gray-50">
-                        <td class="px-4 py-2">{{ $resident->full_name }}</td>
+                        <td class="px-4 py-2">{{ $resident->name }}</td>
                         <td class="px-4 py-2">{{ $resident->email }}</td>
                         <td class="px-4 py-2">{{ $resident->age }}</td>
                         <td class="px-4 py-2">{{ $resident->civil_status }}</td>
                         <td class="px-4 py-2">{{ $resident->purok }}</td>
-                        <td class="px-4 py-2 capitalize">Resident</td>
                         <td class="px-4 py-2 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">
+                            <button onclick='showResidentDetails(@json($resident))' class="text-blue-600 hover:underline text-sm">
                                 View
-                            </a>
+                            </button>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">
+                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">
                             No residents found.
                         </td>
                     </tr>
@@ -70,8 +68,86 @@
 </div>
 </div>
 
+<!-- RESIDENT DETAILS MODAL -->
+<div id="residentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Resident Details</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-sm font-medium text-gray-600">Name</label>
+                    <p id="modalName" class="text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600">Email</label>
+                    <p id="modalEmail" class="text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600">Age</label>
+                    <p id="modalAge" class="text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600">Civil Status</label>
+                    <p id="modalCivilStatus" class="text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600">Purok</label>
+                    <p id="modalPurok" class="text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600">Barangay</label>
+                    <p id="modalBarangay" class="text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600">City</label>
+                    <p id="modalCity" class="text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600">Indigent Status</label>
+                    <p id="modalIndigent" class="text-gray-800 mt-1"></p>
+                </div>
+                <div class="col-span-2">
+                    <label class="text-sm font-medium text-gray-600">Date Registered</label>
+                    <p id="modalDateIssued" class="text-gray-800 mt-1"></p>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 border-t flex justify-end">
+            <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- SIMPLE SEARCH SCRIPT -->
 <script>
+function showResidentDetails(resident) {
+    document.getElementById('modalName').textContent = resident.name || 'N/A';
+    document.getElementById('modalEmail').textContent = resident.email || 'N/A';
+    document.getElementById('modalAge').textContent = resident.age || 'N/A';
+    document.getElementById('modalCivilStatus').textContent = resident.civil_status || 'N/A';
+    document.getElementById('modalPurok').textContent = resident.purok || 'N/A';
+    document.getElementById('modalBarangay').textContent = resident.barangay || 'N/A';
+    document.getElementById('modalCity').textContent = resident.city || 'N/A';
+    document.getElementById('modalIndigent').textContent = resident.is_indigent || 'N/A';
+    document.getElementById('modalDateIssued').textContent = resident.date_issued || 'N/A';
+    document.getElementById('residentModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('residentModal').classList.add('hidden');
+}
+
 function filterTable() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#residentsTable tr');

@@ -30,7 +30,7 @@ class UserFactory extends Factory
             'role' => 'resident',
             'age' => fake()->numberBetween(18, 80),
             'civil_status' => fake()->randomElement(['Single', 'Married', 'Divorced', 'Widowed']),
-            'purok' => fake()->streetName(),
+            'purok' => fake()->randomElement(['Purok Mahigugma-on', 'Purok Gumamela', 'Purok Santol', 'Purok Cebasca', 'Purok Fuente']),
             'barangay' => 'Bagacay',
             'city' => 'Dumaguete City',
             'is_indigent' => fake()->randomElement(['Yes', 'No']),
