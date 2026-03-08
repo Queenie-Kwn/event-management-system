@@ -23,5 +23,8 @@ class Event extends Model
         'start_time',
         'end_time',
         'location',
+        'latitude',
+        'longitude',
+        'event_type',
     ];
 }

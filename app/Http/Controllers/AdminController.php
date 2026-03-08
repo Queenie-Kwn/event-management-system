@@ -73,11 +73,20 @@ class AdminController extends Controller
             'rejected' => $rejectedRequests
         ];
         
+        // Residents with cash assistance
+        $residentsWithAssistance = User::where('role', '!=', 'admin')
+                                ->where('is_indigent', '!=', 'N/A')
+                                ->whereNotNull('is_indigent')
+                                ->select('name', 'purok', 'is_indigent')
+                                ->orderBy('name')
+                                ->get();
+        
         return view('admin.dashboard', compact(
             'totalUsers', 'totalRequests', 'totalEvents', 'totalAdmins',
             'pendingRequests', 'approvedRequests', 'rejectedRequests',
             'monthlyRequests', 'monthlyUsers', 'documentTypes',
-            'recentRequests', 'recentUsers', 'purokDistribution', 'statusData'
+            'recentRequests', 'recentUsers', 'purokDistribution', 'statusData',
+            'residentsWithAssistance'
         ));
     }
 
@@ -263,12 +272,55 @@ class AdminController extends Controller
             'longitude' => $request->longitude,
             'is_indigent' => $request->cash_assistance_programs,
             'purpose' => 'Resident Registration',
-            'date_issued' => $request->date_issued ?? now()->format('Y-m-d'),
+            'date_issued' => now()->format('Y-m-d'),
         ]);
 
         $this->logActivity('ADD_RESIDENT', "Added new resident: {$fullName}");
 
         return redirect()->route('add-user.portal')->with('success', 'Resident registered successfully!');
+    }
+
+    public function events()
+    {
+        $events = Event::orderBy('event_date', 'desc')->get();
+        return view('admin.events', compact('events'));
+    }
+
+    public function storeEvent(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'event_type' => 'required|string',
+            'event_date' => 'required|date',
+            'location' => 'required|string',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ], [
+            'latitude.required' => 'Please click on the map to set the event location.',
+            'longitude.required' => 'Please click on the map to set the event location.',
+        ]);
+
+        Event::create($request->all());
+        
+        $this->logActivity('CREATE_EVENT', "Created cash assistance event: {$request->title}");
+
+        return redirect()->route('admin.events')->with('success', 'Event created successfully!');
+    }
+
+    public function showEvent($id)
+    {
+        $event = Event::findOrFail($id);
+        return response()->json($event);
+    }
+
+    public function deleteEvent($id)
+    {
+        $event = Event::findOrFail($id);
+        $event->delete();
+        
+        $this->logActivity('DELETE_EVENT', "Deleted event: {$event->title}");
+        
+        return redirect()->route('admin.events')->with('success', 'Event deleted successfully!');
     }
 
     

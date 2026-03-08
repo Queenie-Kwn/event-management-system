@@ -34,6 +34,11 @@
                     <span class="font-medium">Dashboard</span>
                 </a>
 
+                <a href="{{ route('admin.events') }}" class="flex items-center gap-3 py-3 px-4 rounded-2xl {{ request()->routeIs('admin.events*') ? 'bg-blue-100 text-blue-700' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
+                    <i data-feather="calendar" class="w-5 h-5"></i>
+                    <span class="font-medium">Cash Assistance Events</span>
+                </a>
+
                 <a href="{{ route('dashboard.document-requests') }}" class="flex items-center gap-3 py-3 px-4 rounded-2xl {{ request()->routeIs('dashboard.document-requests') ? 'bg-blue-100 text-blue-700' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' }} transition-all duration-200">
                     <i data-feather="file-text" class="w-5 h-5"></i>
                     <span class="font-medium">Document Requests</span>

@@ -16,8 +16,16 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(3)
             ->get();
+        
+        // Get upcoming cash assistance events matching user's exact assistance program
+        $upcomingEvents = \App\Models\Event::where('event_date', '>', now()->toDateString())
+            ->whereNotNull('event_type')
+            ->where('event_type', $user->is_indigent)
+            ->orderBy('event_date', 'asc')
+            ->limit(5)
+            ->get();
             
-        return view('home.user', compact('user', 'recentRequests'));
+        return view('home.user', compact('user', 'recentRequests', 'upcomingEvents'));
     }
 
     public function myRequests()
@@ -86,5 +94,17 @@ class UserController extends Controller
     public function requestGoodMoral()
     {
         return view('user.documents.good-moral');
+    }
+
+    public function events()
+    {
+        $user = Auth::user();
+        $events = \App\Models\Event::where('event_date', '>', now()->toDateString())
+            ->whereNotNull('event_type')
+            ->where('event_type', $user->is_indigent)
+            ->orderBy('event_date', 'asc')
+            ->get();
+            
+        return view('user.events', compact('events'));
     }
 }

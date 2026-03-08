@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::table('documents', function (Blueprint $table) {
+            $table->dropForeign(['request_id']);
+        });
+        
         Schema::dropIfExists('document_requests');
         
         Schema::create('document_requests', function (Blueprint $table) {
@@ -21,6 +25,13 @@ return new class extends Migration
             $table->foreign('resident_id')
                   ->references('user_id')
                   ->on('users')
+                  ->onDelete('cascade');
+        });
+        
+        Schema::table('documents', function (Blueprint $table) {
+            $table->foreign('request_id')
+                  ->references('request_id')
+                  ->on('document_requests')
                   ->onDelete('cascade');
         });
     }
