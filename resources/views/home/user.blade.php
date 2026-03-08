@@ -87,6 +87,9 @@
                                 <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
                                     {{ substr($user->name, 0, 1) }}
                                 </div>
+                                @if($upcomingEvents->count() > 0)
+                                <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></div>
+                                @endif
                                 <button onclick="toggleProfileMenu()" class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform">
                                     <i data-feather="chevron-down" class="w-3 h-3 text-gray-600"></i>
                                 </button>
@@ -103,6 +106,15 @@
                     <p class="text-sm text-gray-600">{{ $user->email }}</p>
                 </div>
                 <div class="p-2">
+                    <a href="{{ route('user.events') }}" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <i data-feather="calendar" class="w-4 h-4 text-green-600"></i>
+                            <span class="text-sm font-medium">Upcoming Events</span>
+                        </div>
+                        @if($upcomingEvents->count() > 0)
+                        <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">{{ $upcomingEvents->count() }}</span>
+                        @endif
+                    </a>
                     <a href="{{ route('user.requests') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors">
                         <i data-feather="file-text" class="w-4 h-4 text-blue-600"></i>
                         <span class="text-sm font-medium">My Requests</span>
@@ -193,6 +205,50 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Cash Assistance Events -->
+            @if($upcomingEvents->count() > 0)
+            <div class="glass-effect rounded-3xl p-8 animate-slide-up" style="animation-delay: 0.3s;">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900">Upcoming Cash Assistance Events</h3>
+                        <p class="text-gray-600">Events scheduled in your area</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                        <i data-feather="calendar" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    @foreach($upcomingEvents as $event)
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">{{ $event->event_type }}</span>
+                                    <span class="text-gray-500 text-sm">{{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }}</span>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-2">{{ $event->title }}</h4>
+                                <p class="text-gray-600 text-sm mb-3">{{ $event->description }}</p>
+                                <div class="flex items-center gap-4 text-sm">
+                                    <div class="flex items-center gap-1 text-gray-700">
+                                        <i data-feather="map-pin" class="w-4 h-4"></i>
+                                        <span>{{ $event->location }}</span>
+                                    </div>
+                                    @if($event->start_time)
+                                    <div class="flex items-center gap-1 text-gray-700">
+                                        <i data-feather="clock" class="w-4 h-4"></i>
+                                        <span>{{ \Carbon\Carbon::parse($event->start_time)->format('g:i A') }}</span>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             <!-- Document Services -->
             <div class="glass-effect rounded-3xl p-8 animate-slide-up" style="animation-delay: 0.4s;">

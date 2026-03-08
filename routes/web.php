@@ -149,10 +149,31 @@ Route::get('/residents-map', [AdminController::class, 'residentsWithGeoTag'])
     ->middleware(['auth', 'admin'])
     ->name('admin.residents-map');
 
+// Cash Assistance Events
+Route::get('/admin/events', [AdminController::class, 'events'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.events');
+
+Route::post('/admin/events', [AdminController::class, 'storeEvent'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.events.store');
+
+Route::get('/admin/events/{id}', [AdminController::class, 'showEvent'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.events.show');
+
+Route::delete('/admin/events/{id}', [AdminController::class, 'deleteEvent'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.events.delete');
+
 // User Request Status
 Route::get('/user/request-status/{id}', [UserController::class, 'viewRequestStatus'])
     ->middleware('auth')
     ->name('user.request-status');
+
+Route::get('/user/events', [UserController::class, 'events'])
+    ->middleware('auth')
+    ->name('user.events');
 
 Route::get('/barangay-certification', function () {
     return view('portals.barangay-certification');

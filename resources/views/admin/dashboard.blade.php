@@ -182,7 +182,50 @@
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Residents with Cash Assistance -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Cash Assistance</h3>
+                <div class="flex gap-2">
+                    <select id="purokFilter" class="px-2 py-1 text-xs border border-gray-300 rounded-lg">
+                        <option value="">All Puroks</option>
+                        @foreach($purokDistribution as $purok)
+                            <option value="{{ $purok->purok }}">{{ $purok->purok }}</option>
+                        @endforeach
+                    </select>
+                    <select id="assistanceFilter" class="px-2 py-1 text-xs border border-gray-300 rounded-lg">
+                        <option value="">All Types</option>
+                        <option value="4Ps">4Ps</option>
+                        <option value="AICS">AICS</option>
+                        <option value="DSWD">DSWD</option>
+                        <option value="Senior">Senior</option>
+                        <option value="PWD">PWD</option>
+                    </select>
+                </div>
+            </div>
+            <div id="assistanceList" class="space-y-3 max-h-80 overflow-y-auto">
+                @forelse($residentsWithAssistance as $resident)
+                <div class="resident-item flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-xl" 
+                     data-purok="{{ $resident->purok }}" 
+                     data-assistance="{{ $resident->is_indigent }}">
+                    <div>
+                        <p class="text-gray-900 font-medium text-sm">{{ $resident->name }}</p>
+                        <p class="text-gray-500 text-xs">{{ $resident->purok }}</p>
+                    </div>
+                    <span class="bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold">{{ $resident->is_indigent }}</span>
+                </div>
+                @empty
+                <div class="text-center py-4 text-gray-500">
+                    <i data-feather="users" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
+                    <p>No residents with cash assistance</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 gap-6">
         <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
             <h3 class="text-xl font-bold text-gray-900 mb-6">Recent Document Requests</h3>
             <div class="space-y-3">
@@ -267,8 +310,29 @@
     // Initialize Feather icons
     feather.replace();
     
-    // Add some interactive animations
+    // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {
+        const purokFilter = document.getElementById('purokFilter');
+        const assistanceFilter = document.getElementById('assistanceFilter');
+        
+        function applyFilters() {
+            const purok = purokFilter.value.toLowerCase();
+            const assistance = assistanceFilter.value.toLowerCase();
+            const items = document.querySelectorAll('.resident-item');
+            
+            items.forEach(item => {
+                const itemPurok = item.dataset.purok.toLowerCase();
+                const itemAssistance = item.dataset.assistance.toLowerCase();
+                const purokMatch = !purok || itemPurok.includes(purok);
+                const assistanceMatch = !assistance || itemAssistance.includes(assistance);
+                
+                item.style.display = (purokMatch && assistanceMatch) ? 'flex' : 'none';
+            });
+        }
+        
+        purokFilter.addEventListener('change', applyFilters);
+        assistanceFilter.addEventListener('change', applyFilters);
+        
         // Animate cards on load
         const cards = document.querySelectorAll('.bg-white');
         cards.forEach((card, index) => {

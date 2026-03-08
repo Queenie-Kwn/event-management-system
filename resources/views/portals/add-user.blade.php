@@ -159,13 +159,6 @@
             </select>
         </div>
 
-        <!-- Date Issued -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Date Issued</label>
-            <input type="date" name="date_issued"
-                   class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-        </div>
-
         <!-- Buttons -->
         <div class="md:col-span-2 lg:col-span-3 flex justify-end gap-4 mt-6">
             <a href="{{ url()->previous() }}"
