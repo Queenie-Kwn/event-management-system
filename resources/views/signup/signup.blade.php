@@ -124,11 +124,9 @@
                 <label for="purok" class="block text-sm font-medium text-slate-700 mb-2">Purok</label>
                 <select name="purok" id="purok" onchange="updateMapByPurok()" class="w-full bg-slate-50/50 border-0 rounded-2xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200" required>
                     <option value="">Select Purok</option>
-                    <option value="Purok Mahigugma-on">Purok Mahigugma-on</option>
-                    <option value="Purok Gumamela">Purok Gumamela</option>
-                    <option value="Purok Santol">Purok Santol</option>
-                    <option value="Purok Cebasca">Purok Cebasca</option>
-                    <option value="Purok Fuente">Purok Fuente</option>
+                    @foreach(config('puroks') as $name => $coords)
+                    <option value="{{ $name }}">{{ $name }}</option>
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -197,13 +195,7 @@
     let map, marker;
     
     // Purok coordinates
-    const purokLocations = {
-        'Purok Mahigugma-on': [9.3085, 123.3030],
-        'Purok Gumamela': [9.3070, 123.3020],
-        'Purok Santol': [9.3090, 123.3015],
-        'Purok Cebasca': [9.3065, 123.3035],
-        'Purok Fuente': [9.3080, 123.3040]
-    };
+    const purokLocations = @json(array_map(fn($c) => [$c['lat'], $c['lng']], config('puroks')));
     
     // Cash assistance program colors
     const programColors = {
@@ -230,7 +222,7 @@
     
     // Initialize Leaflet Map
     function initMap() {
-        const defaultLocation = [9.3077, 123.3026]; // Dumaguete City
+        const defaultLocation = [9.300472, 123.293472]; // Barangay Bagacay
         
         map = L.map('map').setView(defaultLocation, 15);
         

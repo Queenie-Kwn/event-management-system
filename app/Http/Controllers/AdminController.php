@@ -230,12 +230,13 @@ class AdminController extends Controller
 
     public function residentsWithGeoTag()
     {
-        $residents = User::where('role', '!=', 'admin')
+        $residents = User::where('role', '!=', 'admin')->paginate(10);
+        $allResidents = User::where('role', '!=', 'admin')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
-            ->paginate(10);
+            ->get(['name', 'purok', 'full_address', 'latitude', 'longitude', 'is_indigent']);
             
-        return view('admin.residents-map', compact('residents'));
+        return view('admin.residents-map', compact('residents', 'allResidents'));
     }
 
     public function storeResident(Request $request)
@@ -292,6 +293,8 @@ class AdminController extends Controller
             'title' => 'required|string|max:255',
             'event_type' => 'required|string',
             'event_date' => 'required|date',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i|after:start_time',
             'location' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',

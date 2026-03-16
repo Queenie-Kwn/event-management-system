@@ -93,7 +93,7 @@
                     <textarea name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg"></textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
                         <input type="date" name="event_date" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
@@ -102,17 +102,19 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
                         <input type="time" name="start_time" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                        <input type="time" name="end_time" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                    </div>
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Purok</label>
                     <select name="location" id="purokSelect" required class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="zoomToPurok(this.value)">
                         <option value="">Select Purok</option>
-                        <option value="Purok Mahigugma-on">Purok Mahigugma-on</option>
-                        <option value="Purok Gumamela">Purok Gumamela</option>
-                        <option value="Purok Santol">Purok Santol</option>
-                        <option value="Purok Cebasca">Purok Cebasca</option>
-                        <option value="Purok Fuente">Purok Fuente</option>
+                        @foreach(config('puroks') as $name => $coords)
+                        <option value="{{ $name }}">{{ $name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 
@@ -150,14 +152,22 @@
     let eventMap, eventMarker;
     let selectedLat = null;
     let selectedLng = null;
+    let purokCircles = {};
     
-    const purokCoordinates = {
-        'Purok Mahigugma-on': [9.3100, 123.3040],
-        'Purok Gumamela': [9.3090, 123.3060],
-        'Purok Santol': [9.3080, 123.3050],
-        'Purok Cebasca': [9.3070, 123.3070],
-        'Purok Fuente': [9.3060, 123.3055]
-    };
+    const purokCoordinates = @json(array_map(fn($c) => [$c['lat'], $c['lng']], config('puroks')));
+    
+    function drawPurokCircles() {
+        Object.entries(purokCoordinates).forEach(([name, coords]) => {
+            const circle = L.circle(coords, {
+                radius: 80,
+                color: '#6366f1',
+                fillColor: '#6366f1',
+                fillOpacity: 0.12,
+                weight: 2,
+            }).addTo(eventMap).bindTooltip(name, { permanent: false, direction: 'top' });
+            purokCircles[name] = circle;
+        });
+    }
     
     function openCreateModal() {
         document.getElementById('createModal').classList.remove('hidden');
@@ -165,20 +175,20 @@
         
         setTimeout(() => {
             if (!eventMap) {
-                const bagacay = [9.3089, 123.3050];
-                eventMap = L.map('eventMap').setView(bagacay, 14);
+                const bagacay = [9.300472, 123.293472];
+                eventMap = L.map('eventMap').setView(bagacay, 15);
                 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(eventMap);
+
+                drawPurokCircles();
                 
                 eventMap.on('click', function(e) {
                     selectedLat = e.latlng.lat;
                     selectedLng = e.latlng.lng;
                     
-                    if (eventMarker) {
-                        eventMap.removeLayer(eventMarker);
-                    }
+                    if (eventMarker) eventMap.removeLayer(eventMarker);
                     
                     eventMarker = L.marker([selectedLat, selectedLng], {
                         icon: L.divIcon({
@@ -205,12 +215,19 @@
     
     function zoomToPurok(purok) {
         if (purok && purokCoordinates[purok] && eventMap) {
-            const coords = purokCoordinates[purok];
-            eventMap.setView(coords, 17);
-            
+            eventMap.setView(purokCoordinates[purok], 17);
             if (eventMarker) {
                 eventMap.removeLayer(eventMarker);
+                eventMarker = null;
             }
+            // Highlight selected circle, reset others
+            Object.entries(purokCircles).forEach(([name, circle]) => {
+                if (name === purok) {
+                    circle.setStyle({ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.2, weight: 3 });
+                } else {
+                    circle.setStyle({ color: '#6366f1', fillColor: '#6366f1', fillOpacity: 0.12, weight: 2 });
+                }
+            });
         }
     }
     
@@ -220,6 +237,8 @@
             eventMap.removeLayer(eventMarker);
             eventMarker = null;
         }
+        // Reset all circles
+        Object.values(purokCircles).forEach(c => c.setStyle({ color: '#6366f1', fillColor: '#6366f1', fillOpacity: 0.12, weight: 2 }));
         document.getElementById('purokSelect').value = '';
         document.getElementById('coordsDisplay').textContent = 'Not set';
     }
@@ -238,7 +257,8 @@
                         <p><strong>Type:</strong> ${data.event_type || 'N/A'}</p>
                         <p><strong>Description:</strong> ${data.description || 'N/A'}</p>
                         <p><strong>Date:</strong> ${data.event_date}</p>
-                        <p><strong>Time:</strong> ${data.start_time || 'N/A'}</p>
+                        <p><strong>Start Time:</strong> ${data.start_time || 'N/A'}</p>
+                        <p><strong>End Time:</strong> ${data.end_time || 'N/A'}</p>
                         <p><strong>Location:</strong> ${data.location}</p>
                         <p><strong>Coordinates:</strong> ${data.latitude || 'N/A'}, ${data.longitude || 'N/A'}</p>
                     </div>
