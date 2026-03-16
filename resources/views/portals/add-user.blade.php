@@ -110,11 +110,9 @@
             <select name="purok" id="purok" onchange="updateMapByPurok()"
                    class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
                 <option value="">Select Purok</option>
-                <option value="Purok Mahigugma-on">Purok Mahigugma-on</option>
-                <option value="Purok Gumamela">Purok Gumamela</option>
-                <option value="Purok Santol">Purok Santol</option>
-                <option value="Purok Cebasca">Purok Cebasca</option>
-                <option value="Purok Fuente">Purok Fuente</option>
+                @foreach(config('puroks') as $name => $coords)
+                <option value="{{ $name }}">{{ $name }}</option>
+                @endforeach
             </select>
         </div>
 
@@ -178,16 +176,10 @@
 <script>
     let map, marker;
     
-    const purokLocations = {
-        'Purok Mahigugma-on': [9.3085, 123.3030],
-        'Purok Gumamela': [9.3070, 123.3020],
-        'Purok Santol': [9.3090, 123.3015],
-        'Purok Cebasca': [9.3065, 123.3035],
-        'Purok Fuente': [9.3080, 123.3040]
-    };
+    const purokLocations = @json(array_map(fn($c) => [$c['lat'], $c['lng']], config('puroks')));
     
     function initMap() {
-        const bagacay = [9.2833, 123.2833];
+        const bagacay = [9.300472, 123.293472]; // Barangay Bagacay center
         
         map = L.map('map').setView(bagacay, 15);
         

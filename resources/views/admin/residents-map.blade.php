@@ -40,50 +40,59 @@
                     <button onclick="filterByPurok('all')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-indigo-600 text-white" data-purok="all">
                         All Puroks
                     </button>
-                    <button onclick="filterByPurok('Purok Mahigugma-on')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-indigo-500 hover:text-white" data-purok="Purok Mahigugma-on">
-                        Mahigugma-on
+                    @foreach(config('puroks') as $name => $coords)
+                    <button onclick="filterByPurok('{{ $name }}')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-indigo-500 hover:text-white" data-purok="{{ $name }}">
+                        {{ $name }}
                     </button>
-                    <button onclick="filterByPurok('Purok Gumamela')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-indigo-500 hover:text-white" data-purok="Purok Gumamela">
-                        Gumamela
-                    </button>
-                    <button onclick="filterByPurok('Purok Santol')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-indigo-500 hover:text-white" data-purok="Purok Santol">
-                        Santol
-                    </button>
-                    <button onclick="filterByPurok('Purok Cebasca')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-indigo-500 hover:text-white" data-purok="Purok Cebasca">
-                        Cebasca
-                    </button>
-                    <button onclick="filterByPurok('Purok Fuente')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-indigo-500 hover:text-white" data-purok="Purok Fuente">
-                        Fuente
-                    </button>
+                    @endforeach
                 </div>
             </div>
             
             <!-- Map Container -->
-            <div id="residentsMap" class="w-full h-96 bg-gray-200 rounded-xl mb-6 relative z-0"></div>
+            <div id="residentsMap" class="w-full h-[500px] bg-gray-200 rounded-xl mb-6 relative z-0"></div>
             
             <!-- Residents List -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div id="residentCards" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 @forelse($residents as $resident)
-                <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer" 
-                     onclick="focusOnResident({{ $resident->latitude }}, {{ $resident->longitude }}, '{{ $resident->name }}')">
+                <div class="resident-card bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors {{ $resident->latitude && $resident->longitude ? 'cursor-pointer' : '' }}" 
+                     data-program="{{ $resident->is_indigent }}"
+                     data-purok="{{ $resident->purok }}"
+                     @if($resident->latitude && $resident->longitude)
+                     onclick="focusOnResident({{ $resident->latitude }}, {{ $resident->longitude }})"
+                     @endif>
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
                             <h3 class="font-medium text-gray-900">{{ $resident->name }}</h3>
                             <p class="text-sm text-gray-600 mt-1">{{ $resident->purok }}</p>
-                            <p class="text-sm text-gray-500 mt-2">{{ $resident->full_address ?? 'No address provided' }}</p>
+                            <p class="text-xs text-blue-600 mt-1">{{ $resident->is_indigent ?? 'No Program' }}</p>
+                            <p class="text-sm text-gray-500 mt-1">{{ $resident->full_address ?? 'No address provided' }}</p>
                         </div>
                         <div class="text-right text-xs text-gray-400">
-                            <p>{{ $resident->latitude }}, {{ $resident->longitude }}</p>
+                            @if($resident->latitude && $resident->longitude)
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-700 mb-1">
+                                    📍 Mapped
+                                </span>
+                                <p>{{ $resident->latitude }}, {{ $resident->longitude }}</p>
+                            @else
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-500">
+                                    No location
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
                 @empty
-                <div class="col-span-2 text-center py-12">
+                <div class="col-span-2 text-center py-12" id="emptyState">
                     <i data-feather="map-pin" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">No Geo-tagged Residents</h3>
                     <p class="text-gray-500">Residents with location data will appear here</p>
                 </div>
                 @endforelse
+            </div>
+            <div id="noFilterResults" class="col-span-2 text-center py-12 hidden">
+                <i data-feather="filter" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No Matching Residents</h3>
+                <p class="text-gray-500">No residents match the selected filters</p>
             </div>
             
             <!-- Pagination -->
@@ -123,7 +132,7 @@
     }
     
     function initResidentsMap() {
-        const bagacay = [9.2833, 123.2833];
+        const bagacay = [9.300472, 123.293472]; // Barangay Bagacay center
         
         map = L.map('residentsMap').setView(bagacay, 15);
         
@@ -131,11 +140,11 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
         
-        const residents = @json($residents);
+        const residents = @json($allResidents);
         
         residents.forEach(resident => {
             if (resident.latitude && resident.longitude) {
-                const program = resident.is_indigent || 'Unknown';
+                const program = resident.is_indigent ?? 'Unknown';
                 const color = programColors[program] || '#6b7280';
                 
                 const marker = L.marker([parseFloat(resident.latitude), parseFloat(resident.longitude)], {
@@ -163,27 +172,40 @@
     }
     
     function applyFilters() {
+        const visibleMarkers = [];
+
         markers.forEach(({ marker, program, purok }) => {
             const programMatch = currentProgramFilter === 'all' || program === currentProgramFilter;
             const purokMatch = currentPurokFilter === 'all' || purok === currentPurokFilter;
             
             if (programMatch && purokMatch) {
                 marker.addTo(map);
+                visibleMarkers.push({ marker });
             } else {
                 map.removeLayer(marker);
             }
-        });
-        
-        const visibleMarkers = markers.filter(({ program, purok }) => {
-            const programMatch = currentProgramFilter === 'all' || program === currentProgramFilter;
-            const purokMatch = currentPurokFilter === 'all' || purok === currentPurokFilter;
-            return programMatch && purokMatch;
         });
         
         if (visibleMarkers.length > 0) {
             const group = new L.featureGroup(visibleMarkers.map(m => m.marker));
             map.fitBounds(group.getBounds().pad(0.1));
         }
+
+        // Filter resident cards
+        let visibleCards = 0;
+        document.querySelectorAll('.resident-card').forEach(card => {
+            const programMatch = currentProgramFilter === 'all' || card.dataset.program === currentProgramFilter;
+            const purokMatch = currentPurokFilter === 'all' || card.dataset.purok === currentPurokFilter;
+            if (programMatch && purokMatch) {
+                card.style.display = '';
+                visibleCards++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const noResults = document.getElementById('noFilterResults');
+        if (noResults) noResults.classList.toggle('hidden', visibleCards > 0);
     }
     
     function filterByProgram(program) {
@@ -218,18 +240,15 @@
         applyFilters();
     }
     
-    function focusOnResident(lat, lng, name) {
-        map.setView([parseFloat(lat), parseFloat(lng)], 16);
+    function focusOnResident(lat, lng) {
+        map.setView([parseFloat(lat), parseFloat(lng)], 18);
         
-        // Find and open the corresponding popup
-        const marker = markers.find(m => 
+        const found = markers.find(m => 
             Math.abs(m.marker.getLatLng().lat - parseFloat(lat)) < 0.0001 && 
             Math.abs(m.marker.getLatLng().lng - parseFloat(lng)) < 0.0001
         );
         
-        if (marker) {
-            marker.marker.openPopup();
-        }
+        if (found) found.marker.openPopup();
     }
     
     // Initialize map when page loads
