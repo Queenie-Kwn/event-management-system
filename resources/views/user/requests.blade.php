@@ -178,6 +178,7 @@
                                         @endif
                                     </div>
                                     <div class="flex-1">
+                                        <p class="text-gray-400 text-xs mb-1">#{{ $index + 1 }}</p>
                                         <h3 class="font-semibold text-gray-900 text-lg">
                                             {{ explode(' - ', $request->purpose)[0] ?? 'Document Request' }}
                                         </h3>

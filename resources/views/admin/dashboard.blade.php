@@ -186,7 +186,8 @@
         <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold text-gray-900">Cash Assistance</h3>
-                <div class="flex gap-2">
+                <div class="flex gap-2 items-center">
+                    <span id="assistanceCount" class="text-xs text-gray-500"></span>
                     <select id="purokFilter" class="px-2 py-1 text-xs border border-gray-300 rounded-lg">
                         <option value="">All Puroks</option>
                         @foreach($purokDistribution as $purok)
@@ -204,12 +205,12 @@
                 </div>
             </div>
             <div id="assistanceList" class="space-y-3 max-h-80 overflow-y-auto">
-                @forelse($residentsWithAssistance as $resident)
+                @forelse($residentsWithAssistance as $index => $resident)
                 <div class="resident-item flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-xl" 
                      data-purok="{{ $resident->purok }}" 
                      data-assistance="{{ $resident->is_indigent }}">
                     <div>
-                        <p class="text-gray-900 font-medium text-sm">{{ $resident->name }}</p>
+                        <p class="text-gray-900 font-medium text-sm"><span class="text-gray-400 mr-1">{{ $index + 1 }}.</span>{{ $resident->name }}</p>
                         <p class="text-gray-500 text-xs">{{ $resident->purok }}</p>
                     </div>
                     <span class="bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold">{{ $resident->is_indigent }}</span>
@@ -319,15 +320,19 @@
             const purok = purokFilter.value.toLowerCase();
             const assistance = assistanceFilter.value.toLowerCase();
             const items = document.querySelectorAll('.resident-item');
+            let count = 0;
             
             items.forEach(item => {
                 const itemPurok = item.dataset.purok.toLowerCase();
                 const itemAssistance = item.dataset.assistance.toLowerCase();
                 const purokMatch = !purok || itemPurok.includes(purok);
                 const assistanceMatch = !assistance || itemAssistance.includes(assistance);
-                
-                item.style.display = (purokMatch && assistanceMatch) ? 'flex' : 'none';
+                const visible = purokMatch && assistanceMatch;
+                item.style.display = visible ? 'flex' : 'none';
+                if (visible) count++;
             });
+
+            document.getElementById('assistanceCount').textContent = `${count} record(s)`;
         }
         
         purokFilter.addEventListener('change', applyFilters);
