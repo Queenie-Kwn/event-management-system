@@ -17,6 +17,7 @@
             <table class="w-full">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-8">#</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
@@ -25,8 +26,9 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    @forelse($events as $event)
+                    @forelse($events as $index => $event)
                     <tr>
+                        <td class="px-4 py-3 text-sm text-gray-400">{{ $index + 1 }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900">{{ $event->title }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ $event->event_type ?? 'N/A' }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }}</td>
@@ -46,7 +48,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-gray-500">No events yet</td>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">No events yet</td>
                     </tr>
                     @endforelse
                 </tbody>

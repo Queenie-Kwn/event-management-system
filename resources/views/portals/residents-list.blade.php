@@ -22,6 +22,7 @@
             class="border rounded px-4 py-2 w-64"
             onkeyup="filterTable()"
         >
+        <span id="recordCount" class="text-sm text-gray-500"></span>
 
     </div>
 
@@ -31,6 +32,7 @@
         <table class="min-w-full border-collapse">
             <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
                 <tr>
+                    <th class="px-4 py-3 text-left w-8">#</th>
                     <th class="px-4 py-3 text-left">Name</th>
                     <th class="px-4 py-3 text-left">Email</th>
                     <th class="px-4 py-3 text-left">Age</th>
@@ -42,8 +44,9 @@
 
             <tbody id="residentsTable" class="text-gray-800">
 
-                @forelse ($residents as $resident)
+                @forelse ($residents as $index => $resident)
                     <tr class="border-t hover:bg-gray-50">
+                        <td class="px-4 py-2 text-gray-400 text-sm w-8">{{ $index + 1 }}</td>
                         <td class="px-4 py-2">{{ $resident->name }}</td>
                         <td class="px-4 py-2">{{ $resident->email }}</td>
                         <td class="px-4 py-2">{{ $resident->age }}</td>
@@ -57,7 +60,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">
                             No residents found.
                         </td>
                     </tr>
@@ -151,13 +154,22 @@ function closeModal() {
 function filterTable() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#residentsTable tr');
+    let count = 0;
 
     rows.forEach(row => {
         const text = row.innerText.toLowerCase();
         const matchesSearch = text.includes(search);
         row.style.display = matchesSearch ? '' : 'none';
+        if (matchesSearch) count++;
     });
+
+    document.getElementById('recordCount').textContent = `Showing ${count} record(s)`;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const rows = document.querySelectorAll('#residentsTable tr');
+    document.getElementById('recordCount').textContent = `Showing ${rows.length} record(s)`;
+});
 </script>
 
 @endsection
