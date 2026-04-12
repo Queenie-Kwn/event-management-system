@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\DocumentRequest;
 
 class UserController extends Controller
@@ -40,35 +41,46 @@ class UserController extends Controller
 
     public function viewRequestStatus($id)
     {
-        $request = DocumentRequest::where('request_id', $id)
-            ->where('resident_id', Auth::user()->user_id)
-            ->firstOrFail();
-            
-        return response()->json([
-            'id' => $request->request_id,
-            'document_type' => explode(' - ', $request->purpose)[0] ?? 'Document Request',
-            'purpose' => explode(' - ', $request->purpose, 2)[1] ?? $request->purpose,
-            'status' => $request->status,
-            'request_date' => $request->created_at->format('M d, Y'),
-            'updated_at' => $request->updated_at->format('M d, Y h:i A')
-        ]);
+        try {
+            $request = DocumentRequest::where('request_id', $id)
+                ->where('resident_id', Auth::user()->user_id)
+                ->firstOrFail();
+
+            return response()->json([
+                'id' => $request->request_id,
+                'document_type' => explode(' - ', $request->purpose)[0] ?? 'Document Request',
+                'purpose' => explode(' - ', $request->purpose, 2)[1] ?? $request->purpose,
+                'status' => $request->status,
+                'request_date' => $request->created_at->format('M d, Y'),
+                'updated_at' => $request->updated_at->format('M d, Y h:i A'),
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Request not found or access denied.'], 404);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch request status for ID ' . $id . ': ' . $e->getMessage());
+            return response()->json(['error' => 'Unable to retrieve request status.'], 500);
+        }
     }
 
     public function requestDocument(Request $request)
     {
         $request->validate([
-            'document_type' => 'required|string',
+            'document_type' => 'required|string|max:255',
             'purpose' => 'required|string|max:500',
         ]);
 
-        DocumentRequest::create([
-            'resident_id' => Auth::user()->user_id,
-            'purpose' => $request->document_type . ' - ' . $request->purpose,
-            'request_date' => now()->format('Y-m-d'),
-            'status' => 'pending',
-        ]);
-
-        return redirect()->route('user.dashboard')->with('success', 'Document request submitted successfully!');
+        try {
+            DocumentRequest::create([
+                'resident_id' => Auth::user()->user_id,
+                'purpose' => $request->document_type . ' - ' . $request->purpose,
+                'request_date' => now()->format('Y-m-d'),
+                'status' => 'pending',
+            ]);
+            return redirect()->route('user.dashboard')->with('success', 'Document request submitted successfully!');
+        } catch (\Exception $e) {
+            Log::error('Failed to submit document request: ' . $e->getMessage());
+            return back()->with('error', 'Failed to submit your request. Please try again.');
+        }
     }
 
     public function requestIndigency()

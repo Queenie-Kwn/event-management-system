@@ -9,6 +9,8 @@ use App\Models\Event;
 use App\Models\AdminLog;
 use App\Traits\LogsAdminActivity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class AdminController extends Controller
@@ -146,22 +148,32 @@ class AdminController extends Controller
 
     public function approveRequest($id)
     {
-        $request = DocumentRequest::findOrFail($id);
-        $request->update(['status' => 'approved']);
-        
-        $this->logActivity('APPROVE_REQUEST', "Approved document request ID: {$id} for user: {$request->resident->name}");
-        
-        return redirect()->back()->with('success', 'Document request approved successfully!');
+        try {
+            $request = DocumentRequest::findOrFail($id);
+            DB::transaction(function () use ($request, $id) {
+                $request->update(['status' => 'approved']);
+                $this->logActivity('APPROVE_REQUEST', "Approved document request ID: {$id} for user: {$request->resident->name}");
+            });
+            return redirect()->back()->with('success', 'Document request approved successfully!');
+        } catch (\Exception $e) {
+            Log::error('Failed to approve request ID ' . $id . ': ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to approve the request. Please try again.');
+        }
     }
 
     public function rejectRequest($id)
     {
-        $request = DocumentRequest::findOrFail($id);
-        $request->update(['status' => 'rejected']);
-        
-        $this->logActivity('REJECT_REQUEST', "Rejected document request ID: {$id} for user: {$request->resident->name}");
-        
-        return redirect()->back()->with('success', 'Document request rejected.');
+        try {
+            $request = DocumentRequest::findOrFail($id);
+            DB::transaction(function () use ($request, $id) {
+                $request->update(['status' => 'rejected']);
+                $this->logActivity('REJECT_REQUEST', "Rejected document request ID: {$id} for user: {$request->resident->name}");
+            });
+            return redirect()->back()->with('success', 'Document request rejected.');
+        } catch (\Exception $e) {
+            Log::error('Failed to reject request ID ' . $id . ': ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to reject the request. Please try again.');
+        }
     }
 
     public function viewDocument($id)
@@ -209,23 +221,29 @@ class AdminController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $admin = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-            'role' => 'admin',
-            'civil_status' => 'Single',
-            'purok' => 'Admin Office',
-            'barangay' => 'Bagacay',
-            'city' => 'Dumaguete City',
-            'is_indigent' => 'N/A',
-            'purpose' => 'Admin Account',
-            'date_issued' => now()->format('Y-m-d'),
-        ]);
+        try {
+            $admin = DB::transaction(function () use ($request) {
+                return User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => $request->password,
+                    'role' => 'admin',
+                    'civil_status' => 'Single',
+                    'purok' => 'Admin Office',
+                    'barangay' => 'Bagacay',
+                    'city' => 'Dumaguete City',
+                    'is_indigent' => 'N/A',
+                    'purpose' => 'Admin Account',
+                    'date_issued' => now()->format('Y-m-d'),
+                ]);
+            });
 
-        $this->logActivity('CREATE_ADMIN', "Created new admin account: {$admin->name} ({$admin->email})");
-
-        return redirect()->route('admin.create-admin')->with('success', 'Admin account created successfully!');
+            $this->logActivity('CREATE_ADMIN', "Created new admin account: {$admin->name} ({$admin->email})");
+            return redirect()->route('admin.create-admin')->with('success', 'Admin account created successfully!');
+        } catch (\Exception $e) {
+            Log::error('Failed to create admin account: ' . $e->getMessage());
+            return back()->with('error', 'Failed to create admin account. Please try again.');
+        }
     }
 
     public function residentsWithGeoTag()
@@ -235,8 +253,15 @@ class AdminController extends Controller
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->get(['name', 'purok', 'full_address', 'latitude', 'longitude', 'is_indigent']);
+
+        $programCounts = User::where('role', '!=', 'admin')
+            ->whereNotNull('is_indigent')
+            ->where('is_indigent', '!=', 'N/A')
+            ->selectRaw('is_indigent, COUNT(*) as count')
+            ->groupBy('is_indigent')
+            ->pluck('count', 'is_indigent');
             
-        return view('admin.residents-map', compact('residents', 'allResidents'));
+        return view('admin.residents-map', compact('residents', 'allResidents', 'programCounts'));
     }
 
     public function storeResident(Request $request)
@@ -246,39 +271,45 @@ class AdminController extends Controller
             'last_name' => 'required|string|max:150',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'birthdate' => 'required|date',
+            'birthdate' => 'required|date|before:today',
             'civil_status' => 'required|string|max:20',
             'purok' => 'required|string|max:100',
             'full_address' => 'required|string|max:500',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'cash_assistance_programs' => 'required|string|max:255',
         ]);
 
-        $age = \Carbon\Carbon::parse($request->birthdate)->age;
-        $fullName = trim($request->first_name . ' ' . ($request->middle_name ?? '') . ' ' . $request->last_name . ' ' . ($request->suffix ?? ''));
-        
-        User::create([
-            'name' => $fullName,
-            'email' => $request->email,
-            'password' => $request->password,
-            'role' => 'resident',
-            'age' => $age,
-            'civil_status' => $request->civil_status,
-            'purok' => $request->purok,
-            'barangay' => 'Bagacay',
-            'city' => 'Dumaguete City',
-            'full_address' => $request->full_address,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'is_indigent' => $request->cash_assistance_programs,
-            'purpose' => 'Resident Registration',
-            'date_issued' => now()->format('Y-m-d'),
-        ]);
+        try {
+            $age = Carbon::parse($request->birthdate)->age;
+            $fullName = trim($request->first_name . ' ' . ($request->middle_name ?? '') . ' ' . $request->last_name . ' ' . ($request->suffix ?? ''));
 
-        $this->logActivity('ADD_RESIDENT', "Added new resident: {$fullName}");
+            DB::transaction(function () use ($request, $age, $fullName) {
+                $user = User::create([
+                    'name' => $fullName,
+                    'email' => $request->email,
+                    'password' => $request->password,
+                    'role' => 'resident',
+                    'age' => $age,
+                    'civil_status' => $request->civil_status,
+                    'purok' => $request->purok,
+                    'barangay' => 'Bagacay',
+                    'city' => 'Dumaguete City',
+                    'full_address' => $request->full_address,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                    'is_indigent' => $request->cash_assistance_programs,
+                    'purpose' => 'Resident Registration',
+                    'date_issued' => now()->format('Y-m-d'),
+                ]);
+                $this->logActivity('ADD_RESIDENT', "Added new resident: {$fullName}");
+            });
 
-        return redirect()->route('add-user.portal')->with('success', 'Resident registered successfully!');
+            return redirect()->route('add-user.portal')->with('success', 'Resident registered successfully!');
+        } catch (\Exception $e) {
+            Log::error('Failed to register resident: ' . $e->getMessage());
+            return back()->with('error', 'Failed to register resident. Please try again.')->withInput();
+        }
     }
 
     public function events()
@@ -289,25 +320,34 @@ class AdminController extends Controller
 
     public function storeEvent(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'title' => 'required|string|max:255',
             'event_type' => 'required|string',
-            'event_date' => 'required|date',
+            'event_date' => 'required|date|after_or_equal:today',
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i|after:start_time',
-            'location' => 'required|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'location' => 'required|string|max:500',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ], [
             'latitude.required' => 'Please click on the map to set the event location.',
             'longitude.required' => 'Please click on the map to set the event location.',
+            'event_date.after_or_equal' => 'Event date must be today or in the future.',
         ]);
 
-        Event::create($request->all());
-        
-        $this->logActivity('CREATE_EVENT', "Created cash assistance event: {$request->title}");
-
-        return redirect()->route('admin.events')->with('success', 'Event created successfully!');
+        try {
+            DB::transaction(function () use ($request) {
+                $event = Event::create($request->only([
+                    'title', 'event_type', 'event_date', 'start_time',
+                    'end_time', 'location', 'latitude', 'longitude', 'description',
+                ]));
+                $this->logActivity('CREATE_EVENT', "Created cash assistance event: {$event->title}");
+            });
+            return redirect()->route('admin.events')->with('success', 'Event created successfully!');
+        } catch (\Exception $e) {
+            Log::error('Failed to create event: ' . $e->getMessage());
+            return back()->with('error', 'Failed to create event. Please try again.')->withInput();
+        }
     }
 
     public function showEvent($id)
@@ -318,12 +358,18 @@ class AdminController extends Controller
 
     public function deleteEvent($id)
     {
-        $event = Event::findOrFail($id);
-        $event->delete();
-        
-        $this->logActivity('DELETE_EVENT', "Deleted event: {$event->title}");
-        
-        return redirect()->route('admin.events')->with('success', 'Event deleted successfully!');
+        try {
+            $event = Event::findOrFail($id);
+            $title = $event->title;
+            DB::transaction(function () use ($event, $title) {
+                $event->delete();
+                $this->logActivity('DELETE_EVENT', "Deleted event: {$title}");
+            });
+            return redirect()->route('admin.events')->with('success', 'Event deleted successfully!');
+        } catch (\Exception $e) {
+            Log::error('Failed to delete event ID ' . $id . ': ' . $e->getMessage());
+            return redirect()->route('admin.events')->with('error', 'Failed to delete event. Please try again.');
+        }
     }
 
     
