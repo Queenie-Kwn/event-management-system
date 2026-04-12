@@ -23,15 +23,27 @@
                     </button>
                     <button onclick="filterByProgram('Pantawid Pamilyang Pilipino Program (4Ps)')" class="filter-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white" data-program="Pantawid Pamilyang Pilipino Program (4Ps)">
                         <span class="inline-block w-3 h-3 rounded-full bg-red-500 mr-2"></span>Pantawid (4Ps)
+                        @if(($programCounts['Pantawid Pamilyang Pilipino Program (4Ps)'] ?? 0) > 0)
+                        <span class="ml-1 bg-red-100 text-red-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">{{ $programCounts['Pantawid Pamilyang Pilipino Program (4Ps)'] }}</span>
+                        @endif
                     </button>
                     <button onclick="filterByProgram('Targeted Cash Transfers (TCT)')" class="filter-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white" data-program="Targeted Cash Transfers (TCT)">
                         <span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>TCT
+                        @if(($programCounts['Targeted Cash Transfers (TCT)'] ?? 0) > 0)
+                        <span class="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">{{ $programCounts['Targeted Cash Transfers (TCT)'] }}</span>
+                        @endif
                     </button>
                     <button onclick="filterByProgram('Sustainable Livelihood Program (SLP)')" class="filter-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-orange-500 hover:text-white" data-program="Sustainable Livelihood Program (SLP)">
                         <span class="inline-block w-3 h-3 rounded-full bg-orange-500 mr-2"></span>SLP
+                        @if(($programCounts['Sustainable Livelihood Program (SLP)'] ?? 0) > 0)
+                        <span class="ml-1 bg-orange-100 text-orange-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">{{ $programCounts['Sustainable Livelihood Program (SLP)'] }}</span>
+                        @endif
                     </button>
                     <button onclick="filterByProgram('Assistance to Individuals in Crisis Situations (AICS)')" class="filter-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-yellow-500 hover:text-white" data-program="Assistance to Individuals in Crisis Situations (AICS)">
                         <span class="inline-block w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>AICS
+                        @if(($programCounts['Assistance to Individuals in Crisis Situations (AICS)'] ?? 0) > 0)
+                        <span class="ml-1 bg-yellow-100 text-yellow-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">{{ $programCounts['Assistance to Individuals in Crisis Situations (AICS)'] }}</span>
+                        @endif
                     </button>
                 </div>
                 

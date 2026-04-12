@@ -3,41 +3,36 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Resident;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SignupController extends Controller
 {
-  
     public function store(Request $request)
     {
-        // Validate input with custom message for duplicate email
         $request->validate([
             'first_name' => 'required|string|max:150',
             'last_name' => 'required|string|max:150',
             'email' => 'required|email|unique:residents,email|unique:users,email',
             'password' => 'required|string|min:6',
-            'birthdate' => 'required|date',
+            'birthdate' => 'required|date|before:today',
             'civil_status' => 'required|string|max:20',
             'purok' => 'required|string|max:100',
             'full_address' => 'required|string|max:500',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'cash_assistance_programs' => 'required|string|max:255',
         ], [
             'email.unique' => 'This email is already registered.',
+            'birthdate.before' => 'Birthdate must be a past date.',
         ]);
 
         try {
-            // Calculate age from birthdate
             $age = \Carbon\Carbon::parse($request->birthdate)->age;
-            
-            // Combine names
             $fullName = trim($request->first_name . ' ' . ($request->middle_name ?? '') . ' ' . $request->last_name . ' ' . ($request->suffix ?? ''));
-            
-            // Create user with resident role
+
             $user = User::create([
                 'name' => $fullName,
                 'email' => $request->email,
@@ -56,44 +51,36 @@ class SignupController extends Controller
                 'date_issued' => now()->format('Y-m-d'),
             ]);
 
-            // Auto-login the new resident
             Auth::login($user);
-
-            // Redirect to user interface
             return redirect()->route('user.dashboard')->with('success', 'Registration successful! Welcome to your dashboard.');
-
         } catch (\Exception $e) {
-            // Generic error
-            return back()->with('error', 'An error occurred: '.$e->getMessage());
+            Log::error('Registration failed for email ' . $request->email . ': ' . $e->getMessage());
+            return back()->with('error', 'Registration failed. Please try again.')->withInput($request->except('password'));
         }
     }
 
-
     public function LoginUser(Request $request)
     {
-        // Validate input
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        // Attempt to find user by email
-        $user = User::where('email', $request->username)->first();
+        try {
+            $user = User::where('email', $request->username)->first();
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            // Login successful
-            Auth::login($user);
-
-            // Redirect based on role
-            if ($user->role === 'admin') {
-                return redirect()->route('home.admin')->with('success', 'Admin login successful!');
-            } else {
+            if ($user && Hash::check($request->password, $user->password)) {
+                Auth::login($user);
+                if ($user->role === 'admin') {
+                    return redirect()->route('home.admin')->with('success', 'Admin login successful!');
+                }
                 return redirect()->route('user.dashboard')->with('success', 'Login successful!');
             }
-        } else {
-            // Invalid credentials
+
             return back()->with('error', 'Invalid username or password.');
+        } catch (\Exception $e) {
+            Log::error('Login error for user ' . $request->username . ': ' . $e->getMessage());
+            return back()->with('error', 'An error occurred during login. Please try again.');
         }
     }
-
 }
