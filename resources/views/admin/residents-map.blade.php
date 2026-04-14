@@ -55,8 +55,28 @@
                     @foreach(config('puroks') as $name => $coords)
                     <button onclick="filterByPurok('{{ $name }}')" class="purok-btn px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 hover:bg-indigo-500 hover:text-white" data-purok="{{ $name }}">
                         {{ $name }}
+                        @if(($purokCounts[$name] ?? 0) > 0)
+                        <span class="ml-1 bg-indigo-100 text-indigo-700 text-xs font-semibold px-1.5 py-0.5 rounded-full purok-badge">{{ $purokCounts[$name] }}</span>
+                        @endif
                     </button>
                     @endforeach
+                </div>
+
+                <!-- Purok Summary Bar -->
+                <div id="purokSummary" class="hidden mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center">
+                            <i data-feather="map-pin" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-indigo-500 font-medium">Selected Purok</p>
+                            <p id="summaryPurokName" class="text-base font-bold text-indigo-900"></p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-indigo-500 font-medium">Total Members</p>
+                        <p id="summaryMemberCount" class="text-3xl font-extrabold text-indigo-700"></p>
+                    </div>
                 </div>
             </div>
             
@@ -118,6 +138,8 @@
 </div>
 
 <script>
+    const purokCounts = @json($purokCounts);
+
     let map, markers = [];
     let currentProgramFilter = 'all';
     let currentPurokFilter = 'all';
@@ -183,14 +205,23 @@
         }
     }
     
+    function normalizePurok(purok) {
+        return purok.toLowerCase().replace(/^purok\s+/i, '').trim();
+    }
+
+    function purokMatch(stored, filter) {
+        if (filter === 'all') return true;
+        return normalizePurok(stored) === normalizePurok(filter);
+    }
+
     function applyFilters() {
         const visibleMarkers = [];
 
         markers.forEach(({ marker, program, purok }) => {
-            const programMatch = currentProgramFilter === 'all' || program === currentProgramFilter;
-            const purokMatch = currentPurokFilter === 'all' || purok === currentPurokFilter;
+            const programMatches = currentProgramFilter === 'all' || program === currentProgramFilter;
+            const purokMatches = purokMatch(purok, currentPurokFilter);
             
-            if (programMatch && purokMatch) {
+            if (programMatches && purokMatches) {
                 marker.addTo(map);
                 visibleMarkers.push({ marker });
             } else {
@@ -206,9 +237,9 @@
         // Filter resident cards
         let visibleCards = 0;
         document.querySelectorAll('.resident-card').forEach(card => {
-            const programMatch = currentProgramFilter === 'all' || card.dataset.program === currentProgramFilter;
-            const purokMatch = currentPurokFilter === 'all' || card.dataset.purok === currentPurokFilter;
-            if (programMatch && purokMatch) {
+            const programMatches = currentProgramFilter === 'all' || card.dataset.program === currentProgramFilter;
+            const purokMatches = purokMatch(card.dataset.purok, currentPurokFilter);
+            if (programMatches && purokMatches) {
                 card.style.display = '';
                 visibleCards++;
             } else {
@@ -243,11 +274,30 @@
             if (btn.dataset.purok === purok) {
                 btn.classList.remove('bg-gray-200', 'text-gray-700');
                 btn.classList.add('bg-indigo-600', 'text-white');
+                // fix badge color when active
+                btn.querySelectorAll('.purok-badge').forEach(b => {
+                    b.classList.remove('bg-indigo-100', 'text-indigo-700');
+                    b.classList.add('bg-white', 'text-indigo-700');
+                });
             } else {
                 btn.classList.remove('bg-indigo-600', 'text-white', 'bg-indigo-500');
                 btn.classList.add('bg-gray-200', 'text-gray-700');
+                btn.querySelectorAll('.purok-badge').forEach(b => {
+                    b.classList.remove('bg-white');
+                    b.classList.add('bg-indigo-100', 'text-indigo-700');
+                });
             }
         });
+
+        const summary = document.getElementById('purokSummary');
+        if (purok === 'all') {
+            summary.classList.add('hidden');
+        } else {
+            document.getElementById('summaryPurokName').textContent = purok;
+            document.getElementById('summaryMemberCount').textContent = purokCounts[purok] ?? 0;
+            summary.classList.remove('hidden');
+            feather.replace();
+        }
         
         applyFilters();
     }

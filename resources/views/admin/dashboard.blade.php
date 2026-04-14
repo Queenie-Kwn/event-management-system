@@ -166,12 +166,16 @@
             <h3 class="text-xl font-bold text-gray-900 mb-6">Residents by Purok</h3>
             <div class="space-y-3">
                 @forelse($purokDistribution as $purok)
-                <div class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl">
+                <div class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl cursor-pointer hover:from-blue-100 hover:to-blue-200 transition-all"
+                     onclick="showPurokDetail('{{ addslashes($purok->purok) }}', {{ $purok->count }})">  
                     <div class="flex items-center">
                         <i data-feather="map-pin" class="w-4 h-4 text-blue-600 mr-2"></i>
                         <span class="text-gray-700 font-medium">{{ $purok->purok ?: 'Unknown Purok' }}</span>
                     </div>
-                    <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">{{ $purok->count }}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">{{ $purok->count }}</span>
+                        <i data-feather="chevron-right" class="w-4 h-4 text-blue-400"></i>
+                    </div>
                 </div>
                 @empty
                 <div class="text-center py-4 text-gray-500">
@@ -225,7 +229,23 @@
         </div>
     </div>
 
-    <!-- Recent Activity -->
+<!-- Purok Detail Modal -->
+<div id="purokModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 id="modalPurokName" class="text-xl font-bold text-gray-900"></h3>
+                <p class="text-sm text-gray-500 mt-1">Total Members: <span id="modalTotalCount" class="font-bold text-blue-600 text-base"></span></p>
+            </div>
+            <button onclick="closePurokModal()" class="text-gray-400 hover:text-gray-600">
+                <i data-feather="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div id="modalAssistanceList" class="space-y-3 max-h-72 overflow-y-auto">
+        </div>
+        <p id="modalNoAssistance" class="text-center text-gray-400 text-sm py-4 hidden">No assistance program members in this purok.</p>
+    </div>
+</div>
     <div class="grid grid-cols-1 gap-6">
         <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
             <h3 class="text-xl font-bold text-gray-900 mb-6">Recent Document Requests</h3>
@@ -310,6 +330,50 @@
 <script>
     // Initialize Feather icons
     feather.replace();
+
+    const assistanceByPurok = @json($assistanceByPurok);
+
+    const programColors = {
+        'Pantawid Pamilyang Pilipino Program (4Ps)': 'bg-red-100 text-red-700',
+        'Targeted Cash Transfers (TCT)': 'bg-blue-100 text-blue-700',
+        'Sustainable Livelihood Program (SLP)': 'bg-orange-100 text-orange-700',
+        'Assistance to Individuals in Crisis Situations (AICS)': 'bg-yellow-100 text-yellow-700',
+    };
+
+    function showPurokDetail(purokName, totalCount) {
+        document.getElementById('modalPurokName').textContent = purokName;
+        document.getElementById('modalTotalCount').textContent = totalCount;
+
+        const list = document.getElementById('modalAssistanceList');
+        const noAssistance = document.getElementById('modalNoAssistance');
+        list.innerHTML = '';
+
+        const programs = assistanceByPurok[purokName];
+        if (programs && programs.length > 0) {
+            noAssistance.classList.add('hidden');
+            programs.forEach(p => {
+                const colorClass = programColors[p.is_indigent] || 'bg-gray-100 text-gray-700';
+                list.innerHTML += `
+                    <div class="flex items-center justify-between p-3 rounded-xl ${colorClass}">
+                        <span class="font-medium text-sm">${p.is_indigent}</span>
+                        <span class="font-bold text-sm">${p.count} member${p.count > 1 ? 's' : ''}</span>
+                    </div>`;
+            });
+        } else {
+            noAssistance.classList.remove('hidden');
+        }
+
+        document.getElementById('purokModal').classList.remove('hidden');
+        feather.replace();
+    }
+
+    function closePurokModal() {
+        document.getElementById('purokModal').classList.add('hidden');
+    }
+
+    document.getElementById('purokModal').addEventListener('click', function(e) {
+        if (e.target === this) closePurokModal();
+    });
     
     // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {

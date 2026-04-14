@@ -82,13 +82,23 @@ class AdminController extends Controller
                                 ->select('name', 'purok', 'is_indigent')
                                 ->orderBy('name')
                                 ->get();
+
+        // Assistance members per purok (for purok detail modal)
+        $assistanceByPurok = User::where('role', '!=', 'admin')
+                                ->whereNotNull('purok')
+                                ->whereNotNull('is_indigent')
+                                ->where('is_indigent', '!=', 'N/A')
+                                ->selectRaw('purok, is_indigent, COUNT(*) as count')
+                                ->groupBy('purok', 'is_indigent')
+                                ->get()
+                                ->groupBy('purok');
         
         return view('admin.dashboard', compact(
             'totalUsers', 'totalRequests', 'totalEvents', 'totalAdmins',
             'pendingRequests', 'approvedRequests', 'rejectedRequests',
             'monthlyRequests', 'monthlyUsers', 'documentTypes',
             'recentRequests', 'recentUsers', 'purokDistribution', 'statusData',
-            'residentsWithAssistance'
+            'residentsWithAssistance', 'assistanceByPurok'
         ));
     }
 
@@ -260,8 +270,17 @@ class AdminController extends Controller
             ->selectRaw('is_indigent, COUNT(*) as count')
             ->groupBy('is_indigent')
             ->pluck('count', 'is_indigent');
+
+        $purokCounts = User::where('role', '!=', 'admin')
+            ->whereNotNull('purok')
+            ->selectRaw('purok, COUNT(*) as count')
+            ->groupBy('purok')
+            ->pluck('count', 'purok')
+            ->mapWithKeys(fn($count, $purok) => [
+                preg_replace('/^purok\s+/i', '', trim($purok)) => $count
+            ]);
             
-        return view('admin.residents-map', compact('residents', 'allResidents', 'programCounts'));
+        return view('admin.residents-map', compact('residents', 'allResidents', 'programCounts', 'purokCounts'));
     }
 
     public function storeResident(Request $request)
