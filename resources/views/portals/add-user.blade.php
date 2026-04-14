@@ -37,28 +37,28 @@
         <!-- First Name -->
         <div>
             <label class="block text-sm font-medium text-gray-700">First Name</label>
-            <input type="text" name="first_name"
+            <input type="text" name="first_name" value="{{ old('first_name') }}"
                 class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
         <!-- Middle Name -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Middle Name</label>
-            <input type="text" name="middle_name"
+            <input type="text" name="middle_name" value="{{ old('middle_name') }}"
                 class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
         </div>
 
         <!-- Last Name -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Last Name</label>
-            <input type="text" name="last_name"
+            <input type="text" name="last_name" value="{{ old('last_name') }}"
                 class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
         <!-- Suffix -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Suffix</label>
-            <input type="text" name="suffix" placeholder="Jr., Sr., III (optional)"
+            <input type="text" name="suffix" value="{{ old('suffix') }}" placeholder="Jr., Sr., III (optional)"
                 class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
         </div>
 
@@ -66,14 +66,14 @@
         <!-- Email -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email"
+            <input type="email" name="email" value="{{ old('email') }}"
                    class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
         <!-- Contact Number -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Contact Number</label>
-            <input type="tel" name="contact_number"
+            <input type="tel" name="contact_number" value="{{ old('contact_number') }}"
                    class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
@@ -87,7 +87,7 @@
         <!-- Birthdate -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Birthdate</label>
-            <input type="date" name="birthdate"
+            <input type="date" name="birthdate" value="{{ old('birthdate') }}"
                    class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
         </div>
 
@@ -97,10 +97,10 @@
             <select name="civil_status"
                 class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
                 <option value="">Select status</option>
-                <option>Single</option>
-                <option>Married</option>
-                <option>Divorced</option>
-                <option>Widowed</option>
+                <option {{ old('civil_status') == 'Single' ? 'selected' : '' }}>Single</option>
+                <option {{ old('civil_status') == 'Married' ? 'selected' : '' }}>Married</option>
+                <option {{ old('civil_status') == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+                <option {{ old('civil_status') == 'Widowed' ? 'selected' : '' }}>Widowed</option>
             </select>
         </div>
 
@@ -111,7 +111,7 @@
                    class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
                 <option value="">Select Purok</option>
                 @foreach(config('puroks') as $name => $coords)
-                <option value="{{ $name }}">{{ $name }}</option>
+                <option value="{{ $name }}" {{ old('purok') == $name ? 'selected' : '' }}>{{ $name }}</option>
                 @endforeach
             </select>
         </div>
@@ -120,7 +120,7 @@
         <div class="md:col-span-2 lg:col-span-3">
             <label class="block text-sm font-medium text-gray-700">Full Address</label>
             <textarea name="full_address" rows="3"
-                      class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required></textarea>
+                      class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>{{ old('full_address') }}</textarea>
         </div>
 
         <!-- Geo-tagging Section -->
@@ -150,10 +150,10 @@
             <select name="cash_assistance_programs"
                 class="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" required>
                 <option value="">Select Cash Assistance Program</option>
-                <option value="Pantawid Pamilyang Pilipino Program (4Ps)">Pantawid Pamilyang Pilipino Program (4Ps)</option>
-                <option value="Assistance to Individuals in Crisis Situations (AICS)">Assistance to Individuals in Crisis Situations (AICS)</option>
-                <option value="Sustainable Livelihood Program (SLP)">Sustainable Livelihood Program (SLP)</option>
-                <option value="Targeted Cash Transfers (TCT)">Targeted Cash Transfers (TCT)</option>
+                <option value="Pantawid Pamilyang Pilipino Program (4Ps)" {{ old('cash_assistance_programs') == 'Pantawid Pamilyang Pilipino Program (4Ps)' ? 'selected' : '' }}>Pantawid Pamilyang Pilipino Program (4Ps)</option>
+                <option value="Assistance to Individuals in Crisis Situations (AICS)" {{ old('cash_assistance_programs') == 'Assistance to Individuals in Crisis Situations (AICS)' ? 'selected' : '' }}>Assistance to Individuals in Crisis Situations (AICS)</option>
+                <option value="Sustainable Livelihood Program (SLP)" {{ old('cash_assistance_programs') == 'Sustainable Livelihood Program (SLP)' ? 'selected' : '' }}>Sustainable Livelihood Program (SLP)</option>
+                <option value="Targeted Cash Transfers (TCT)" {{ old('cash_assistance_programs') == 'Targeted Cash Transfers (TCT)' ? 'selected' : '' }}>Targeted Cash Transfers (TCT)</option>
             </select>
         </div>
 
