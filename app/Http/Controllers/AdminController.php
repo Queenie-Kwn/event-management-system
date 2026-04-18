@@ -262,7 +262,10 @@ class AdminController extends Controller
         $allResidents = User::where('role', '!=', 'admin')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
-            ->get(['name', 'purok', 'full_address', 'latitude', 'longitude', 'is_indigent']);
+            ->get(['name', 'purok', 'full_address', 'latitude', 'longitude', 'is_indigent', 'age', 'civil_status']);
+
+        $allResidentsForModal = User::where('role', '!=', 'admin')
+            ->get(['name', 'purok', 'full_address', 'is_indigent', 'age', 'civil_status']);
 
         $programCounts = User::where('role', '!=', 'admin')
             ->whereNotNull('is_indigent')
@@ -279,8 +282,18 @@ class AdminController extends Controller
             ->mapWithKeys(fn($count, $purok) => [
                 preg_replace('/^purok\s+/i', '', trim($purok)) => $count
             ]);
+
+        $purokProgramCounts = User::where('role', '!=', 'admin')
+            ->whereNotNull('purok')
+            ->whereNotNull('is_indigent')
+            ->where('is_indigent', '!=', 'N/A')
+            ->selectRaw('purok, is_indigent, COUNT(*) as count')
+            ->groupBy('purok', 'is_indigent')
+            ->get()
+            ->groupBy(fn($r) => preg_replace('/^purok\s+/i', '', trim($r->purok)))
+            ->map(fn($rows) => $rows->pluck('count', 'is_indigent'));
             
-        return view('admin.residents-map', compact('residents', 'allResidents', 'programCounts', 'purokCounts'));
+        return view('admin.residents-map', compact('residents', 'allResidents', 'programCounts', 'purokCounts', 'purokProgramCounts', 'allResidentsForModal'));
     }
 
     public function storeResident(Request $request)

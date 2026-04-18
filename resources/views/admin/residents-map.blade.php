@@ -63,20 +63,23 @@
                 </div>
 
                 <!-- Purok Summary Bar -->
-                <div id="purokSummary" class="hidden mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center">
-                            <i data-feather="map-pin" class="w-5 h-5 text-white"></i>
+                <div id="purokSummary" class="hidden mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center">
+                                <i data-feather="map-pin" class="w-5 h-5 text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-indigo-500 font-medium">Selected Purok</p>
+                                <p id="summaryPurokName" class="text-base font-bold text-indigo-900"></p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-xs text-indigo-500 font-medium">Selected Purok</p>
-                            <p id="summaryPurokName" class="text-base font-bold text-indigo-900"></p>
+                        <div class="text-right">
+                            <p class="text-xs text-indigo-500 font-medium">Members</p>
+                            <p id="summaryMemberCount" class="text-3xl font-extrabold text-indigo-700"></p>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-xs text-indigo-500 font-medium">Total Members</p>
-                        <p id="summaryMemberCount" class="text-3xl font-extrabold text-indigo-700"></p>
-                    </div>
+                    <div id="summaryProgramBreakdown" class="flex flex-wrap gap-2"></div>
                 </div>
             </div>
             
@@ -127,6 +130,22 @@
                 <p class="text-gray-500">No residents match the selected filters</p>
             </div>
             
+            <!-- Residents Modal -->
+            <div id="residentsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900" id="modalTitle">Residents</h3>
+                            <p class="text-xs text-gray-500 mt-0.5" id="modalSubtitle"></p>
+                        </div>
+                        <button onclick="closeResidentsModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <i data-feather="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div id="modalBody" class="divide-y divide-gray-50 max-h-80 overflow-y-auto"></div>
+                </div>
+            </div>
+
             <!-- Pagination -->
             @if($residents->hasPages())
             <div class="mt-6">
@@ -139,8 +158,18 @@
 
 <script>
     const purokCounts = @json($purokCounts);
+    const purokProgramCounts = @json($purokProgramCounts);
+    const purokCoords = @json(config('puroks'));
+    const allResidentsForModal = @json($allResidentsForModal);
 
-    let map, markers = [];
+    const programLabels = {
+        'Pantawid Pamilyang Pilipino Program (4Ps)': 'Pantawid',
+        'Targeted Cash Transfers (TCT)': 'TCT',
+        'Sustainable Livelihood Program (SLP)': 'SLP',
+        'Assistance to Individuals in Crisis Situations (AICS)': 'AICS'
+    };
+
+    let map, markers = [], purokMarkers = [];
     let currentProgramFilter = 'all';
     let currentPurokFilter = 'all';
     
@@ -150,6 +179,9 @@
         'Sustainable Livelihood Program (SLP)': '#f97316',
         'Assistance to Individuals in Crisis Situations (AICS)': '#eab308'
     };
+
+    // 4 fixed pinned puroks
+    const pinnedPuroks = ['Fuente', 'Kalipay', 'Cebasca', 'Riverside'];
     
     function createColoredIcon(color) {
         return L.divIcon({
@@ -164,9 +196,75 @@
             popupAnchor: [0, -42]
         });
     }
+
+    function createPurokPinIcon(label) {
+        return L.divIcon({
+            className: '',
+            html: `<div style="background:#4f46e5;color:#fff;font-size:11px;font-weight:700;padding:4px 8px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);border:2px solid #fff">${label}</div>`,
+            iconAnchor: [0, 0],
+            popupAnchor: [0, -10]
+        });
+    }
+
+    function getPurokPopupContent(purokName, program) {
+        const counts = purokProgramCounts[purokName] || {};
+        const total = purokCounts[purokName] || 0;
+        const programLabel = program !== 'all' ? (programLabels[program] || program) : null;
+        const programCount = program !== 'all' ? (counts[program] || 0) : null;
+
+        let rows = '';
+        if (program !== 'all') {
+            rows = `<tr><td style="padding:2px 6px;color:#6b7280">${programLabel}</td><td style="padding:2px 6px;font-weight:700;color:#4f46e5">${programCount}</td></tr>`;
+        } else {
+            Object.entries(programLabels).forEach(([key, label]) => {
+                const c = counts[key] || 0;
+                if (c > 0) rows += `<tr><td style="padding:2px 6px;color:#6b7280">${label}</td><td style="padding:2px 6px;font-weight:700;color:#4f46e5">${c}</td></tr>`;
+            });
+        }
+
+        return `<div style="min-width:160px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:6px;color:#1e1b4b">📍 Purok ${purokName}</div>
+            <table style="width:100%;border-collapse:collapse">
+                ${rows || '<tr><td colspan="2" style="color:#9ca3af;font-size:12px">No data</td></tr>'}
+            </table>
+            <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;font-size:11px;color:#6b7280">Total members: <strong>${total}</strong></div>
+        </div>`;
+    }
+
+    function updatePurokMarkers() {
+        purokMarkers.forEach(({ marker, purokName }) => {
+            marker.setPopupContent(getPurokPopupContent(purokName, currentProgramFilter));
+
+            const counts = purokProgramCounts[purokName] || {};
+            const count = currentProgramFilter !== 'all'
+                ? (counts[currentProgramFilter] || 0)
+                : (purokCounts[purokName] || 0);
+            const label = currentProgramFilter !== 'all'
+                ? `${purokName}: ${count}`
+                : `${purokName} (${count})`;
+            marker.setIcon(createPurokPinIcon(label));
+        });
+    }
+
+    function initPurokPins() {
+        pinnedPuroks.forEach(purokName => {
+            const coords = purokCoords[purokName];
+            if (!coords) return;
+            const count = purokCounts[purokName] || 0;
+            const marker = L.marker([coords.lat, coords.lng], {
+                icon: createPurokPinIcon(`${purokName} (${count})`),
+                zIndexOffset: 1000
+            })
+            .addTo(map)
+            .bindPopup(getPurokPopupContent(purokName, 'all'));
+
+            marker.on('click', () => filterByPurok(purokName));
+            purokMarkers.push({ marker, purokName });
+        });
+    }
     
     function initResidentsMap() {
-        const bagacay = [9.300472, 123.293472]; // Barangay Bagacay center
+        const bagacay = [9.300472, 123.293472];
         
         map = L.map('residentsMap').setView(bagacay, 15);
         
@@ -203,6 +301,8 @@
             const group = new L.featureGroup(markers.map(m => m.marker));
             map.fitBounds(group.getBounds().pad(0.1));
         }
+
+        initPurokPins();
     }
     
     function normalizePurok(purok) {
@@ -249,6 +349,8 @@
 
         const noResults = document.getElementById('noFilterResults');
         if (noResults) noResults.classList.toggle('hidden', visibleCards > 0);
+
+        updatePurokMarkers();
     }
     
     function filterByProgram(program) {
@@ -265,6 +367,7 @@
         });
         
         applyFilters();
+        updateSummaryBar();
     }
     
     function filterByPurok(purok) {
@@ -274,7 +377,6 @@
             if (btn.dataset.purok === purok) {
                 btn.classList.remove('bg-gray-200', 'text-gray-700');
                 btn.classList.add('bg-indigo-600', 'text-white');
-                // fix badge color when active
                 btn.querySelectorAll('.purok-badge').forEach(b => {
                     b.classList.remove('bg-indigo-100', 'text-indigo-700');
                     b.classList.add('bg-white', 'text-indigo-700');
@@ -289,19 +391,91 @@
             }
         });
 
-        const summary = document.getElementById('purokSummary');
-        if (purok === 'all') {
-            summary.classList.add('hidden');
-        } else {
-            document.getElementById('summaryPurokName').textContent = purok;
-            document.getElementById('summaryMemberCount').textContent = purokCounts[purok] ?? 0;
-            summary.classList.remove('hidden');
-            feather.replace();
-        }
-        
+        updateSummaryBar();
         applyFilters();
     }
+
+    function updateSummaryBar() {
+        const summary = document.getElementById('purokSummary');
+        if (currentPurokFilter === 'all') {
+            summary.classList.add('hidden');
+            return;
+        }
+
+        const counts = purokProgramCounts[currentPurokFilter] || {};
+        const total = purokCounts[currentPurokFilter] || 0;
+
+        // Build program breakdown badges
+        let badges = '';
+        const badgeColors = {
+            'Pantawid Pamilyang Pilipino Program (4Ps)': 'bg-red-100 text-red-700',
+            'Targeted Cash Transfers (TCT)': 'bg-blue-100 text-blue-700',
+            'Sustainable Livelihood Program (SLP)': 'bg-orange-100 text-orange-700',
+            'Assistance to Individuals in Crisis Situations (AICS)': 'bg-yellow-100 text-yellow-700'
+        };
+
+        if (currentProgramFilter !== 'all') {
+            const label = programLabels[currentProgramFilter] || currentProgramFilter;
+            const count = counts[currentProgramFilter] || 0;
+            const colorClass = badgeColors[currentProgramFilter] || 'bg-gray-100 text-gray-700';
+            badges = `<button onclick="openResidentsModal('${currentPurokFilter}', '${currentProgramFilter}')" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold cursor-pointer hover:opacity-75 transition-opacity ${colorClass}">${label}: ${count}</button>`;
+        } else {
+            Object.entries(programLabels).forEach(([key, label]) => {
+                const c = counts[key] || 0;
+                const colorClass = badgeColors[key] || 'bg-gray-100 text-gray-700';
+                badges += `<button onclick="openResidentsModal('${currentPurokFilter}', '${key}')" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold cursor-pointer hover:opacity-75 transition-opacity ${colorClass}">${label}: ${c}</button>`;
+            });
+        }
+
+        document.getElementById('summaryPurokName').textContent = currentPurokFilter;
+        document.getElementById('summaryMemberCount').textContent = 
+            currentProgramFilter !== 'all' ? (counts[currentProgramFilter] || 0) : total;
+        document.getElementById('summaryProgramBreakdown').innerHTML = badges;
+        summary.classList.remove('hidden');
+        feather.replace();
+    }
     
+    function openResidentsModal(purokName, programKey) {
+        const programLabel = programLabels[programKey] || programKey;
+        const filtered = allResidentsForModal.filter(r => {
+            const rPurok = r.purok ? r.purok.toLowerCase().replace(/^purok\s+/i, '').trim() : '';
+            return rPurok === purokName.toLowerCase().trim() && r.is_indigent === programKey;
+        });
+
+        document.getElementById('modalTitle').textContent = `${programLabel} — Purok ${purokName}`;
+        document.getElementById('modalSubtitle').textContent = `${filtered.length} resident${filtered.length !== 1 ? 's' : ''} found`;
+
+        const body = document.getElementById('modalBody');
+        body.innerHTML = filtered.length === 0
+            ? `<div class="px-6 py-8 text-center text-gray-400 text-sm">No residents found.</div>`
+            : filtered.map((r, i) => `
+                <div class="px-6 py-3 flex items-center gap-3 hover:bg-gray-50">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold flex-shrink-0">${i + 1}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-gray-900 text-sm truncate">${r.name}</p>
+                        <p class="text-xs text-gray-500 truncate">${r.full_address || 'No address'}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-xs text-gray-400">${r.age ? r.age + ' yrs' : ''}</p>
+                        <p class="text-xs text-gray-400">${r.civil_status || ''}</p>
+                    </div>
+                </div>
+            `).join('');
+
+        document.getElementById('residentsModal').classList.remove('hidden');
+        feather.replace();
+    }
+
+    function closeResidentsModal() {
+        document.getElementById('residentsModal').classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('residentsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeResidentsModal();
+        });
+    });
+
     function focusOnResident(lat, lng) {
         map.setView([parseFloat(lat), parseFloat(lng)], 18);
         
@@ -313,7 +487,6 @@
         if (found) found.marker.openPopup();
     }
     
-    // Initialize map when page loads
     document.addEventListener('DOMContentLoaded', function() {
         initResidentsMap();
     });
