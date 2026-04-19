@@ -4,7 +4,7 @@ return [
     'Kalipay'         => ['lat' => 9.300472, 'lng' => 123.294306],
     'Cebasca'         => ['lat' => 9.301611, 'lng' => 123.293472],
     'Mahigugmaon'     => ['lat' => 9.300500, 'lng' => 123.296917],
-    'Rovinil Village' => ['lat' => 9.296528, 'lng' => 123.293472],
+    'Rovinil Village' => ['lat' => 9.295833, 'lng' => 123.294500],
     'Santol'          => ['lat' => 9.297861, 'lng' => 123.292083],
     'Madasigon'       => ['lat' => 9.296472, 'lng' => 123.293722],
     'Makugihon'       => ['lat' => 9.298472, 'lng' => 123.293028],

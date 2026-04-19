@@ -91,7 +91,7 @@
         let eventsMap, markers = [];
         
         function initEventsMap() {
-            const bagacay = [9.3089, 123.3050];
+            const bagacay = [9.300, 123.292];
             eventsMap = L.map('eventsMap').setView(bagacay, 14);
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
